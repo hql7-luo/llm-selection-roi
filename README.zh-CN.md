@@ -87,6 +87,20 @@ python run_analysis.py       # 给所有结果打分，生成 results/、figures
 pytest                       # 检查数据、评分、规则、runner、ROI，以及 Python 和网页结果一致
 ```
 
+### 不用 API key 测其他模型
+
+Claude 的结果就是这样做的，换成其他编程代理（比如 Codex）也一样：
+
+```bash
+python batches.py make ~/llm-batches              # 生成 4 个批次文件，每个 20 份测试询盘，里面没有答案
+# 在 ~/llm-batches 里开一个新的代理会话（不要在本仓库里），回答 batch1..4.txt，
+# 每个回复存成 reply1..4.txt
+python batches.py import codex__<模型名> run1 ~/llm-batches "Codex, batch of 20"
+python run_analysis.py
+```
+
+跑两遍（run1、run2）才有一致性检查。代理作答时不要让它进入本仓库，免得看到 `data/gold.jsonl`。
+
 ### 通过 API 重跑
 
 想用正常方式测某个模型（每次一封询盘、temperature 0、有真实 token 数），设置 key 后运行：

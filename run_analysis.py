@@ -82,7 +82,7 @@ def main():
         price = prices.get(method, {})
         m = evaluate_method(RUNS / method, inquiries, gold, prices) if method in folders else None
         estimate = None
-        if price:
+        if price and price.get("input_usd_per_mtok") and price.get("output_usd_per_mtok"):   # blank = no API price
             estimate = 1000 * (tokens_in * float(price["input_usd_per_mtok"])
                                + tokens_out * float(price["output_usd_per_mtok"])) / 1e6
         cost_measured = m is not None and m["cost_per_1000_usd"] is not None and method != "rules"
@@ -92,7 +92,8 @@ def main():
                "status": "measured" if m else "pending",
                "tested_via": m["via"] if m else "",
                "cost_per_1000_usd": cost,
-               "cost_basis": "none" if method == "rules" else ("measured" if cost_measured else "estimated"),
+               "cost_basis": ("none" if method == "rules" else "measured" if cost_measured
+                              else "estimated" if estimate is not None else "n/a"),
                "public_index": float(index) if index else None,
                "breakeven_error_rate": roi.breakeven_error_rate(inp, (cost or 0) / 1000)}
         if m:
@@ -185,7 +186,7 @@ def main():
                               headline["labor_saved_per_1000_usd"], headline["manual_cost_per_1000_usd"],
                               FIGURES / "1_cost_vs_labor.png")
     llm_points = [(r["critical_error_rate"], roi.monthly(inp, r["critical_error_rate"],
-                                                         r["cost_per_1000_usd"] / 1000)["net_month"])
+                                                         (r["cost_per_1000_usd"] or 0) / 1000)["net_month"])
                   for r in summary if r["status"] == "measured" and r["method"] != "rules"]
     charts.plot_breakeven(curves, (rules["critical_error_rate"], rules_month["net_month"]), llm_points, base_be,
                           inp["monthly_volume"], FIGURES / "2_breakeven.png")
@@ -200,7 +201,8 @@ def main():
     if llm_measured:                                   # only after at least one LLM has been run
         points = [{"method": r["method"], "name": r["name"], "cost_per_1000": r["cost_per_1000_usd"] or 0,
                    "critical_error_rate": r["critical_error_rate"]}
-                  for r in summary if r["status"] == "measured"]
+                  for r in summary if r["status"] == "measured"
+                  and (r["method"] == "rules" or r["cost_per_1000_usd"] is not None)]   # no price, no x position
         charts.plot_measured(points, base_be, FIGURES / "5_measured.png")
 
     # 5) Data for the interactive calculator (docs/index.html)

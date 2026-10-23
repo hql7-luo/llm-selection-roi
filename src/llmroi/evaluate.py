@@ -92,7 +92,7 @@ def evaluate_method(method_dir, inquiries, gold, prices):
     records = [run[i] for run in runs for i in ids]
     price = prices.get(method_dir.name)
     has_tokens = any(r.get("input_tokens") is not None for r in records)
-    if price and has_tokens:
+    if price and has_tokens and price.get("input_usd_per_mtok") and price.get("output_usd_per_mtok"):
         cost = [(r.get("input_tokens") or 0) * float(price["input_usd_per_mtok"]) / 1e6
                 + (r.get("output_tokens") or 0) * float(price["output_usd_per_mtok"]) / 1e6 for r in records]
         metrics["cost_per_1000_usd"] = 1000 * statistics.mean(cost)

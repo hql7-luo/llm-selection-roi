@@ -13,6 +13,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT))
 
 from llmroi import batch, roi, rules, runner  # noqa: E402
 from llmroi.catalog import (normalize_currency, normalize_delivery, normalize_destination,  # noqa: E402
@@ -143,6 +144,19 @@ def test_subagent_run_files_match_raw_replies(method, tmp_path):
         assert (copy / run).read_text(encoding="utf-8") == (folder / run).read_text(encoding="utf-8")
         records = read_jsonl(folder / run)
         assert [r["id"] for r in records] == ids and all(r["output"] for r in records)
+
+
+def test_agent_import_flow(tmp_path, monkeypatch):
+    import batches as cli
+    monkeypatch.setattr(cli, "ROOT", tmp_path)
+    (tmp_path / "runs").mkdir()
+    cli.make(tmp_path / "out")
+    for k in range(1, 5):
+        raw = ROOT / "runs" / CLAUDE_RUNS[0] / "raw" / "run1" / f"batch{k}.txt"
+        shutil.copy(raw, tmp_path / "out" / f"reply{k}.txt")
+    cli.import_replies("codex__demo", "run1", tmp_path / "out", "Codex, batch of 20")
+    records = read_jsonl(tmp_path / "runs" / "codex__demo" / "run1.jsonl")
+    assert len(records) == 80 and all(r["output"] for r in records) and records[0]["via"] == "Codex, batch of 20"
 
 
 # ---------- runner (API calls are faked) ----------

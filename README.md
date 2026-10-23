@@ -96,6 +96,20 @@ python run_analysis.py       # scores every run, writes results/, figures/ and d
 pytest                       # checks for data, scoring, rules, runner, ROI and calculator parity
 ```
 
+### Test a model without an API key
+
+This is how the Claude results were made, and it works with any coding agent (Codex, for example):
+
+```bash
+python batches.py make ~/llm-batches              # 4 batch files, 20 test inquiries each, no answers inside
+# In a fresh agent session opened in ~/llm-batches (not in this repo), answer batch1..4.txt
+# and save each reply as reply1..4.txt
+python batches.py import codex__<model-name> run1 ~/llm-batches "Codex, batch of 20"
+python run_analysis.py
+```
+
+Run it twice (run1, run2) to get the consistency check. Keep the agent out of this repo while it answers, so it cannot see `data/gold.jsonl`.
+
 ### Re-run through the API
 
 To test a model the normal way (one inquiry per call, temperature 0, real token counts), set its key and run:
@@ -115,6 +129,7 @@ Testing all eight models three times costs about $3.30 at list prices. For a mod
 data/          inquiries.jsonl, gold.jsonl (answer key), catalog, prices, public scores, ROI inputs, field weights
 prompts/       extract_v1.txt (the instructions every model gets)
 src/llmroi/    dataset and labels, rules baseline, API runner, subagent batches, scoring, ROI model, charts
+batches.py     make batch files for an agent and import its replies (no API key)
 runs/          answers per method; runs/<model>/raw/ keeps the subagent replies as received
 results/       output tables (CSV)
 figures/       charts used in this README

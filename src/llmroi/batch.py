@@ -70,7 +70,7 @@ def model_line(text):
 
 
 # Turn saved raw replies into runs/<method>/run<N>.jsonl (one record per inquiry, no token counts)
-def import_raw(method_dir, ids):
+def import_raw(method_dir, ids, via="claude subagent, batch of 20"):
     method_dir = Path(method_dir)
     for raw_run in sorted((method_dir / "raw").glob("run*")):
         answers, models = {}, set()
@@ -81,6 +81,6 @@ def import_raw(method_dir, ids):
         with open(method_dir / f"{raw_run.name}.jsonl", "w", encoding="utf-8") as f:
             for i in ids:
                 record = {"id": i, "output": answers.get(i), "latency_s": None, "input_tokens": None,
-                          "output_tokens": None, "error": None, "via": "claude subagent, batch of 20",
+                          "output_tokens": None, "error": None, "via": via,
                           "model_reported": ", ".join(sorted(m for m in models if m))}
                 f.write(json.dumps(record, ensure_ascii=False) + "\n")

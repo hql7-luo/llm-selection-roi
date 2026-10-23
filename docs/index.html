@@ -231,7 +231,7 @@
       hint_moved: (v) => `Measured result: ${v}. The slider is set to a different value to test "what if".`,
       hint_pending: "No test run yet, so this is your estimate. Run the test to replace it.",
       cost_hint: (c, basis) => `API cost about ${c} per 1,000 inquiries (${basis}).`,
-      basis: { estimated: "estimated from list price", measured: "measured", none: "no API" },
+      basis: { estimated: "estimated from list price", measured: "measured", none: "no API", "n/a": "no API price" },
       g_team: "Your team", monthly_volume: "Inquiries per month", monthly_salary_cny: "Salesperson salary (CNY / month)",
       salary_hint: (h) => `Loaded labor cost about ${h} per hour.`,
       manual_minutes: "Manual handling, minutes each", review_minutes: "Checking an AI draft, minutes",
@@ -269,7 +269,7 @@
       hint_moved: (v) => `实测结果：${v}。滑块已改成别的值，用来做"如果……会怎样"的测算。`,
       hint_pending: "还没有测试结果，这里是你的估计值。跑一次测试即可替换。",
       cost_hint: (c, basis) => `API 成本约每千份 ${c}（${basis}）。`,
-      basis: { estimated: "按标价估算", measured: "实测", none: "不调用 API" },
+      basis: { estimated: "按标价估算", measured: "实测", none: "不调用 API", "n/a": "没有 API 价格" },
       g_team: "团队情况", monthly_volume: "每月询盘数", monthly_salary_cny: "业务员月薪（元）",
       salary_hint: (h) => `含社保等，人工成本约每小时 ${h}。`,
       manual_minutes: "人工处理一封，分钟", review_minutes: "核对 AI 草稿，分钟",
@@ -345,6 +345,8 @@
   }
 
   function apiCost(m) { return (m.cost_per_1000 || 0) / 1000; }
+  // Show the API price, or "n/a" for a model tested without an API price (for example inside a coding agent)
+  const priceText = (m) => (m.cost_per_1000 === null || m.cost_per_1000 === undefined ? "n/a" : money(m.cost_per_1000, 2));
 
   function update() {
     const t = T();
@@ -353,7 +355,7 @@
 
     $("method_badge").textContent = m.status === "measured" ? t.measured : t.pending;
     $("method_badge").className = "badge" + (m.status === "measured" ? " measured" : "");
-    $("method_hint").textContent = t.cost_hint(money(m.cost_per_1000 || 0, 2), t.basis[m.cost_basis] || m.cost_basis)
+    $("method_hint").textContent = t.cost_hint(priceText(m), t.basis[m.cost_basis] || m.cost_basis)
       + (m.public_index ? t.index_hint(m.public_index) : "");
     const viaSub = (m.tested_via || "").includes("subagent");
     const moved = m.status === "measured" && Math.abs(state.error_rate - m.critical_error_rate) > 1e-9;
@@ -393,7 +395,7 @@
       return `
       <tr class="${current ? "current" : ""}">
         <td>${nameOf(m)}<span class="badge${m.status === "measured" ? " measured" : ""}">${m.status === "measured" ? t.measured : t.pending}</span></td>
-        <td class="num">${money(m.cost_per_1000 || 0, 2)}</td>
+        <td class="num">${priceText(m)}</td>
         <td class="num">${show ? pct(e) + est : `<span class="muted">${t.not_run}</span>`}</td>
         <td class="num">${show ? money(r.net_month, 0) : ""}</td>
         <td class="num">${show ? (r.payback_months === null ? t.never : r.payback_months.toFixed(1) + " " + t.months) : ""}</td>
