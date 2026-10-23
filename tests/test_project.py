@@ -14,7 +14,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from llmroi import roi, rules, runner  # noqa: E402
+from llmroi import batch, roi, rules, runner  # noqa: E402
 from llmroi.catalog import (normalize_currency, normalize_delivery, normalize_destination,  # noqa: E402
                             normalize_incoterm, normalize_product, normalize_spec, normalize_unit)
 from llmroi.dataset import build_regular, load_dataset, read_jsonl  # noqa: E402
@@ -111,6 +111,38 @@ def test_rules_run_file_matches_the_code():
 def test_rules_catch_spam():
     out = json.loads(rules.extract("Our SEO team can bring you to page 1 of Google. USD 199 per month.", "2026-10-01"))
     assert out["priority"] == "low" and out["items"] == []
+
+
+# ---------- subagent runs ----------
+
+CLAUDE_RUNS = ["anthropic__claude-haiku-5-5", "anthropic__claude-sonnet-5-5", "anthropic__claude-opus-5-5"]
+
+
+def test_batch_prompt_has_no_answers():
+    inquiries, gold = load_dataset("test")
+    text = batch.batch_prompt(inquiries[:20])
+    assert all(q["id"] in text for q in inquiries[:20])
+    assert "priority_reason\": \"Complete request" not in text and "gold" not in text.lower()
+
+
+def test_parse_reply_reads_jsonl_lines():
+    reply = 'MODEL: test\n```jsonl\n{"id": "R01", "answer": {"items": [], "priority": "low"}}\nnot json\n```'
+    answers = batch.parse_reply(reply)
+    assert list(answers) == ["R01"] and json.loads(answers["R01"])["priority"] == "low"
+
+
+@pytest.mark.parametrize("method", CLAUDE_RUNS)
+def test_subagent_run_files_match_raw_replies(method, tmp_path):
+    inquiries, _ = load_dataset("test")
+    ids = [q["id"] for q in inquiries]
+    folder = ROOT / "runs" / method
+    copy = tmp_path / method
+    shutil.copytree(folder / "raw", copy / "raw")
+    batch.import_raw(copy, ids)
+    for run in ("run1.jsonl", "run2.jsonl"):
+        assert (copy / run).read_text(encoding="utf-8") == (folder / run).read_text(encoding="utf-8")
+        records = read_jsonl(folder / run)
+        assert [r["id"] for r in records] == ids and all(r["output"] for r in records)
 
 
 # ---------- runner (API calls are faked) ----------

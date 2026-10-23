@@ -1,0 +1,9 @@
+method,model,aa_intelligence_index,setting,source,source_url,checked,note
+anthropic__claude-opus-5-5,Claude Opus 5.5,58,highest reasoning setting listed (max with fallback),Artificial Analysis model leaderboard,https://artificialanalysis.ai/leaderboards/models,2026-10-23,General reasoning composite; not an extraction test
+anthropic__claude-sonnet-5-5,Claude Sonnet 5.5,56,highest reasoning setting listed (max with fallback),Artificial Analysis model leaderboard,https://artificialanalysis.ai/leaderboards/models,2026-10-23,General reasoning composite; not an extraction test
+anthropic__claude-haiku-5-5,Claude Haiku 5.5,43,highest reasoning setting listed (max),Artificial Analysis model leaderboard,https://artificialanalysis.ai/leaderboards/models,2026-10-23,General reasoning composite; not an extraction test
+openai__gpt-6.1-sol,GPT-6.1 Sol,52,highest reasoning setting listed (max),Artificial Analysis model leaderboard,https://artificialanalysis.ai/leaderboards/models,2026-10-23,General reasoning composite; not an extraction test
+openai__gpt-6-luna,GPT-6 Luna,38,highest reasoning setting listed (max),Artificial Analysis model leaderboard,https://artificialanalysis.ai/leaderboards/models,2026-10-23,General reasoning composite; non-reasoning setting scores 18
+deepseek__deepseek-flash,DeepSeek V4.1 Flash,45,listed as DeepSeek V4.1 Flash 1017 (max),Artificial Analysis model leaderboard,https://artificialanalysis.ai/leaderboards/models,2026-10-23,General reasoning composite; not an extraction test
+qwen__qwen3.7-flash,Qwen3.7 Flash,,not listed,Artificial Analysis model leaderboard,https://artificialanalysis.ai/leaderboards/models,2026-10-23,Not found on the leaderboard
+qwen__qwen3.5-plus,Qwen3.5 Plus,,not listed,Artificial Analysis model leaderboard,https://artificialanalysis.ai/leaderboards/models,2026-10-23,Not found on the leaderboard

@@ -84,19 +84,24 @@ def evaluate_method(method_dir, inquiries, gold, prices):
     metrics["runs"] = len(runs)
     metrics["consistency"] = (_mean([len({scores[k]["normalized"] for scores in all_scores}) == 1
                                      for k in range(len(ids))]) if len(runs) > 1 else None)
+    # Same right/wrong result on every field in every run (wording of the spec may differ)
+    metrics["score_consistency"] = (_mean([len({tuple(ok for _, ok in scores[k]["checks"]) for scores in all_scores}) == 1
+                                           for k in range(len(ids))]) if len(runs) > 1 else None)
 
     # Cost and speed come from what the API reported
     records = [run[i] for run in runs for i in ids]
     price = prices.get(method_dir.name)
-    if price:
+    has_tokens = any(r.get("input_tokens") is not None for r in records)
+    if price and has_tokens:
         cost = [(r.get("input_tokens") or 0) * float(price["input_usd_per_mtok"]) / 1e6
                 + (r.get("output_tokens") or 0) * float(price["output_usd_per_mtok"]) / 1e6 for r in records]
         metrics["cost_per_1000_usd"] = 1000 * statistics.mean(cost)
     else:
-        metrics["cost_per_1000_usd"] = None          # add a row to data/pricing.csv for this method
+        metrics["cost_per_1000_usd"] = None          # no price row, or no token counts (subagent runs)
     latencies = sorted(r["latency_s"] for r in records if r.get("latency_s") is not None)
     metrics["latency_median_s"] = statistics.median(latencies) if latencies else None
     metrics["latency_p90_s"] = latencies[int(0.9 * (len(latencies) - 1))] if latencies else None
+    metrics["via"] = records[0].get("via") or ("no API" if method_dir.name == "rules" else "API, one inquiry per call")
     metrics["confusion"] = confusion(all_scores[0])
     metrics["all_scores"] = all_scores
     return metrics

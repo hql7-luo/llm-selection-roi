@@ -34,7 +34,16 @@ Labeling decisions worth knowing:
 
 **Rules baseline** ([`rules.py`](../src/llmroi/rules.py)): keyword lists for products and spam, regular expressions for sizes, quantities, prices, Incoterms, ports and dates, and the same priority rubric. It needs no API and is the "what can we do for free" option.
 
-**LLMs** ([`runner.py`](../src/llmroi/runner.py)): one prompt for every model ([`prompts/extract_v1.txt`](../prompts/extract_v1.txt)) with the catalog, field rules, priority rubric and the JSON format; temperature 0; three runs per model. The runner supports the Anthropic API and any OpenAI-compatible API (OpenAI, DeepSeek, Qwen).
+**LLMs through the API** ([`runner.py`](../src/llmroi/runner.py)): one prompt for every model ([`prompts/extract_v1.txt`](../prompts/extract_v1.txt)) with the catalog, field rules, priority rubric and the JSON format; one inquiry per call; temperature 0; three runs per model. The runner supports the Anthropic API and any OpenAI-compatible API (OpenAI, DeepSeek, Qwen). It is ready but was not used for the published results, because no API key was used.
+
+**Claude models through subagents** ([`batch.py`](../src/llmroi/batch.py)), which is how the published Claude results were made:
+
+- The 80 test inquiries were split into 4 batches of 20. Each batch file holds the same instructions as the API prompt plus the 20 messages, and asks for one JSON line per message, each handled "exactly as if it were the only message".
+- Each batch went to a separate Claude Haiku 5.5, Sonnet 5.5 or Opus 5.5 subagent. The subagent was told to open only that batch file; every subagent made exactly one file read and returned its answer. It could not see the answer key.
+- Each model did the 4 batches twice (24 subagent runs in total). Replies are saved unchanged in `runs/<model>/raw/` and converted to the same run files the API runner writes, so scoring is identical.
+- Differences from the API route: 20 messages per request instead of one; the subagent has its own system prompt and default settings (no temperature 0); no token counts or response times are reported, so cost is estimated from list prices and speed is not measured.
+
+**Other vendors**: OpenAI, DeepSeek and Alibaba could not be reached from the build environment, so they are compared on list price and a public leaderboard score only (section 6).
 
 ## 4. Scoring
 
@@ -52,7 +61,7 @@ Code: [`scoring.py`](../src/llmroi/scoring.py) and [`evaluate.py`](../src/llmroi
 | Weighted error | Sum of [field weights](../data/field_weights.csv) of wrong fields per inquiry (quantity and product 5, spec 4, price and delivery 3, ...). |
 | Fabrication rate | Of the places where the message gives no value, the share where the method filled one in anyway. |
 | Priority accuracy, missed-high rate | From the 3 × 3 confusion matrix ([`results/priority_confusion.csv`](../results/priority_confusion.csv)). |
-| JSON failure rate, consistency | Share of unreadable outputs; share of inquiries with identical output in all three runs. |
+| JSON failure rate, consistency | Share of unreadable outputs; share of inquiries with identical output in every run, and share with the same right/wrong result on every field in every run (the spec may be worded differently). |
 | Cost, latency | From the token counts and timing the API reports. Before a run, cost is estimated from list prices: input tokens are about 4 characters each for English and 2.5 for Russian; output is set to twice the length of a correct answer. |
 
 ## 5. ROI model
@@ -84,7 +93,17 @@ With the base case: hourly cost $9.70 (¥8,672 x 1.30 / 174 h / 6.6781), 6 minut
 
 **Sensitivity.** Each assumption moves alone between the low and high values in [`data/roi_inputs.csv`](../data/roi_inputs.csv), plus a "model price" row (cheapest vs. most expensive model). Results: [`results/sensitivity.csv`](../results/sensitivity.csv).
 
-## 6. Choices made along the way
+## 6. Public leaderboard scores
+
+[`data/public_benchmarks.csv`](../data/public_benchmarks.csv) lists the Artificial Analysis Intelligence Index for each model, taken at the highest reasoning setting listed on October 23, 2026. It is a broad reasoning composite, not an extraction test, so it is shown for reference only and is not turned into an error rate.
+
+On the three models tested both ways, the leaderboard spread (Haiku 43, Sonnet 56, Opus 58) did not show up on this task (0.0%, 0.6%, 0.0% critical errors). For a narrow, well-specified extraction job, a general leaderboard is a weak guide; a small test on your own messages is a better one.
+
+## 7. A disputed label
+
+R55 is a Russian inquiry for "термальные пластины CTP" (thermal CTP plates) with no size or thickness. The answer key has no spec, because a plate cannot be quoted without size and thickness. Sonnet's first run wrote "thermal" as the spec, which also fits the prompt's wording ("size, thickness, grade, color or type"). This is the only critical error by any Claude model. The key was not changed after seeing the results.
+
+## 8. Choices made along the way
 
 - **Two tasks, not more.** Extraction and priority are easy to score objectively. Reply drafting was left out because it is hard to grade fairly.
 - **Single prompt, no tuning per model.** Fair and cheap. A team could tune the winner later.
@@ -92,8 +111,9 @@ With the base case: hourly cost $9.70 (¥8,672 x 1.30 / 174 h / 6.6781), 6 minut
 - **Human error is part of the comparison.** Without it, any AI error looks like pure loss.
 - **Maintenance is inside the break-even; setup is not.** Setup is one-time, so it sets the payback period instead.
 
-## 7. What would make this a real decision
+## 9. What would make this a real decision
 
-1. Label 50 to 100 real, anonymized inquiries and re-run.
-2. Time 10 inquiries by hand and 10 AI reviews to replace the minutes assumptions.
-3. Run the models, pick the cheapest one under the bar, then track the catch rate in the first month.
+1. Label 50 to 100 real, anonymized inquiries and re-run. The synthetic set is too easy for the Claude models to tell them apart.
+2. Run the cheapest candidates through the API (for a Chinese team, include DeepSeek and Qwen, which are reachable in mainland China).
+3. Time 10 inquiries by hand and 10 AI reviews to replace the minutes assumptions.
+4. Pick the cheapest model under the bar, then track the catch rate in the first month.

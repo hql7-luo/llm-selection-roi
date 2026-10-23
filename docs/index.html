@@ -93,6 +93,7 @@
   tr.current td { font-weight: 700; }
   tr:last-child td { border-bottom: 0; }
   td .badge { margin-left: 6px; }
+  .muted { color: var(--muted); font-weight: 400; }
 
   #chart { width: 100%; display: block; overflow: visible; touch-action: pan-y; }
   #chart text { font-family: inherit; }
@@ -225,7 +226,9 @@
       g_method: "Method", method: "Model or method",
       error_rate: "Critical error rate",
       measured: "measured", pending: "not run yet",
-      hint_measured: (n) => `Measured on ${n} test inquiries.`,
+      hint_measured: (n, sub) => sub ? `Measured on ${n} test inquiries through Claude subagents (2 runs).` : `Measured on ${n} test inquiries.`,
+      index_hint: (v) => ` Public leaderboard score (Artificial Analysis): ${v}.`,
+      hint_moved: (v) => `Measured result: ${v}. The slider is set to a different value to test "what if".`,
       hint_pending: "No test run yet, so this is your estimate. Run the test to replace it.",
       cost_hint: (c, basis) => `API cost about ${c} per 1,000 inquiries (${basis}).`,
       basis: { estimated: "estimated from list price", measured: "measured", none: "no API" },
@@ -244,8 +247,8 @@
       chart_title: "Net benefit per month as the error rate changes",
       table_title: "Every method at these settings",
       col_method: "Method", col_cost: "API per 1,000", col_error: "Error rate", col_net: "Net per month", col_payback: "Payback",
-      months: "mo", never: "never",
-      table_note: "Methods not run yet use the error rate from the slider. Their rows are almost the same: at these prices, the model's price hardly changes the result.",
+      months: "mo", never: "never", est: "(est.)", not_run: "not tested",
+      table_note: "Measured rows use their own test result. Models not tested here show no result; select one to try your own error-rate estimate. At these prices, the model's price hardly changes the monthly result.",
       foot: (d) => `Prices checked ${d}: Anthropic from its pricing page; OpenAI, DeepSeek and Qwen from a secondary price table. Salary: Liepin, Hangzhou. Other inputs are labeled assumptions. Fictional company; not financial advice.`,
       foot2: "Same model as the Python analysis in the repository; the tests check that both give the same numbers.",
       chart_desc: (be) => `Line chart: monthly net benefit falls as the critical error rate rises and crosses zero at ${be}.`,
@@ -261,7 +264,9 @@
       g_method: "方案", method: "模型或方法",
       error_rate: "关键错误率",
       measured: "已实测", pending: "未测试",
-      hint_measured: (n) => `在 ${n} 份测试询盘上实测。`,
+      hint_measured: (n, sub) => sub ? `在 ${n} 份测试询盘上实测（通过 Claude 子代理，跑 2 遍）。` : `在 ${n} 份测试询盘上实测。`,
+      index_hint: (v) => ` 公开榜单分数（Artificial Analysis）：${v}。`,
+      hint_moved: (v) => `实测结果：${v}。滑块已改成别的值，用来做"如果……会怎样"的测算。`,
       hint_pending: "还没有测试结果，这里是你的估计值。跑一次测试即可替换。",
       cost_hint: (c, basis) => `API 成本约每千份 ${c}（${basis}）。`,
       basis: { estimated: "按标价估算", measured: "实测", none: "不调用 API" },
@@ -280,8 +285,8 @@
       chart_title: "错误率变化时的每月净收益",
       table_title: "在当前设置下比较所有方案",
       col_method: "方案", col_cost: "每千份 API", col_error: "错误率", col_net: "每月净收益", col_payback: "回本",
-      months: "个月", never: "无法回本",
-      table_note: "未测试的方案都按滑块上的错误率计算，所以几行结果几乎一样：按现在的价格，换贵或便宜的模型对结果影响很小。",
+      months: "个月", never: "无法回本", est: "（估计）", not_run: "未测试",
+      table_note: "已实测的方案用自己的测试结果。这里没测的模型不显示结果，选中后可以用滑块填你估计的错误率。按现在的价格，换贵或便宜的模型对每月结果影响很小。",
       foot: (d) => `价格查询于 ${d}：Anthropic 来自官方价格页；OpenAI、DeepSeek、Qwen 来自第三方价格汇总。薪资：猎聘杭州。其他输入均标为假设。公司为虚构，不构成财务建议。`,
       foot2: "和仓库里 Python 分析使用同一个模型；测试会检查两边数字一致。",
       chart_desc: (be) => `折线图：关键错误率越高，每月净收益越低，在 ${be} 处降到零。`,
@@ -294,7 +299,7 @@
   DATA.inputs.forEach((row) => { BASE[row.name] = Number(row.value); });
   const SLIDERS = ["monthly_volume", "monthly_salary_cny", "manual_minutes", "review_minutes", "catch_rate",
     "escaped_error_cost_usd", "manual_error_rate", "setup_cost_usd", "monthly_maintenance_usd"];
-  const state = { lang: "en", method: "rules", error_rate: 0.2, inp: Object.assign({}, BASE) };
+  const state = { lang: "en", method: "anthropic__claude-haiku-5-5", error_rate: 0.2, inp: Object.assign({}, BASE) };
   const $ = (id) => document.getElementById(id);
 
   const money = (v, digits) => {
@@ -348,8 +353,12 @@
 
     $("method_badge").textContent = m.status === "measured" ? t.measured : t.pending;
     $("method_badge").className = "badge" + (m.status === "measured" ? " measured" : "");
-    $("method_hint").textContent = t.cost_hint(money(m.cost_per_1000 || 0, 2), t.basis[m.cost_basis] || m.cost_basis);
-    $("error_hint").textContent = m.status === "measured" ? t.hint_measured(DATA.headline.test_inquiries) : t.hint_pending;
+    $("method_hint").textContent = t.cost_hint(money(m.cost_per_1000 || 0, 2), t.basis[m.cost_basis] || m.cost_basis)
+      + (m.public_index ? t.index_hint(m.public_index) : "");
+    const viaSub = (m.tested_via || "").includes("subagent");
+    const moved = m.status === "measured" && Math.abs(state.error_rate - m.critical_error_rate) > 1e-9;
+    $("error_hint").textContent = m.status !== "measured" ? t.hint_pending
+      : moved ? t.hint_moved(pct(m.critical_error_rate)) : t.hint_measured(DATA.headline.test_inquiries, viaSub);
     $("error_rate").value = state.error_rate;
     $("error_rate_out").textContent = pct(state.error_rate);
     SLIDERS.forEach((name) => { $(name).value = inp[name]; $(name + "_out").textContent = format(name, inp[name]); });
@@ -376,14 +385,20 @@
       const r = M.monthly(state.inp, e, apiCost(m));
       return { m, e, r };
     });
-    $("rows").innerHTML = rows.map(({ m, e, r }) => `
-      <tr class="${m.method === state.method ? "current" : ""}">
+    // Untested methods show no result unless selected; then the slider value is used and marked as an estimate
+    $("rows").innerHTML = rows.map(({ m, e, r }) => {
+      const current = m.method === state.method;
+      const show = m.status === "measured" || current;
+      const est = m.status !== "measured" ? ` <span class="muted">${t.est}</span>` : "";
+      return `
+      <tr class="${current ? "current" : ""}">
         <td>${nameOf(m)}<span class="badge${m.status === "measured" ? " measured" : ""}">${m.status === "measured" ? t.measured : t.pending}</span></td>
         <td class="num">${money(m.cost_per_1000 || 0, 2)}</td>
-        <td class="num">${pct(e)}</td>
-        <td class="num">${money(r.net_month, 0)}</td>
-        <td class="num">${r.payback_months === null ? t.never : r.payback_months.toFixed(1) + " " + t.months}</td>
-      </tr>`).join("");
+        <td class="num">${show ? pct(e) + est : `<span class="muted">${t.not_run}</span>`}</td>
+        <td class="num">${show ? money(r.net_month, 0) : ""}</td>
+        <td class="num">${show ? (r.payback_months === null ? t.never : r.payback_months.toFixed(1) + " " + t.months) : ""}</td>
+      </tr>`;
+    }).join("");
   }
 
   // SVG line chart: net benefit per month (y) against critical error rate (x), with hover readout
@@ -467,7 +482,7 @@
   state.lang = (navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en";
   applyText();
   buildSelect();
-  selectMethod("rules");
+  selectMethod("anthropic__claude-haiku-5-5");
 })();
 </script>
 </body>

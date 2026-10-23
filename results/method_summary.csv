@@ -1,10 +1,10 @@
-method,name,provider,status,cost_per_1000_usd,cost_basis,breakeven_error_rate,critical_error_rate,field_accuracy,fabrication_rate,invented_items_per_100,json_fail_rate,priority_accuracy,missed_high_rate,consistency,runs,latency_median_s,latency_p90_s,net_per_month_usd,payback_months,critical_error_rate_regular,critical_error_rate_hard,critical_error_rate_trap
-rules,Rules baseline (no AI),none,measured,0.0,none,0.1702,0.2,0.9301,0.0438,6.25,0.0,0.8875,0.1739,,1,0.0,0.0,-124.9836,,0.1042,0.55,0.0
-anthropic__claude-haiku-5-5,Claude Haiku 5.5,anthropic,pending,0.1545,estimated,0.1702,,,,,,,,,,,,,,,,
-anthropic__claude-sonnet-5-5,Claude Sonnet 5.5,anthropic,pending,3.0909,estimated,0.1698,,,,,,,,,,,,,,,,
-anthropic__claude-opus-5-5,Claude Opus 5.5,anthropic,pending,6.1817,estimated,0.1695,,,,,,,,,,,,,,,,
-openai__gpt-6-luna,GPT-6 Luna,openai,pending,0.1545,estimated,0.1702,,,,,,,,,,,,,,,,
-openai__gpt-6.1-sol,GPT-6.1 Sol,openai,pending,3.0909,estimated,0.1698,,,,,,,,,,,,,,,,
-deepseek__deepseek-flash,DeepSeek V4.1 Flash,deepseek,pending,0.4179,estimated,0.1701,,,,,,,,,,,,,,,,
-qwen__qwen3.7-flash,Qwen3.7 Flash,qwen,pending,0.0433,estimated,0.1702,,,,,,,,,,,,,,,,
-qwen__qwen3.5-plus,Qwen3.5 Plus,qwen,pending,0.6791,estimated,0.1701,,,,,,,,,,,,,,,,
+method,name,provider,status,tested_via,cost_per_1000_usd,cost_basis,public_index,breakeven_error_rate,critical_error_rate,field_accuracy,fabrication_rate,invented_items_per_100,json_fail_rate,priority_accuracy,missed_high_rate,consistency,score_consistency,runs,latency_median_s,latency_p90_s,net_per_month_usd,payback_months,critical_error_rate_regular,critical_error_rate_hard,critical_error_rate_trap
+rules,Rules baseline (no AI),none,measured,no API,0.0,none,,0.1702,0.2,0.9301,0.0438,6.25,0.0,0.8875,0.1739,,,1,0.0,0.0,-124.9836,,0.1042,0.55,0.0
+anthropic__claude-haiku-5-5,Claude Haiku 5.5,anthropic,measured,"claude subagent, batch of 20",0.1545,estimated,43.0,0.1702,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.95,1,2,,,713.747,2.8021,0.0,0.0,0.0
+anthropic__claude-sonnet-5-5,Claude Sonnet 5.5,anthropic,measured,"claude subagent, batch of 20",3.0909,estimated,56.0,0.1698,0.0063,0.997,0.0036,0.0,0.0,0.9938,0.0,0.95,0.975,2,,,686.0661,2.9152,0.0104,0.0,0.0
+anthropic__claude-opus-5-5,Claude Opus 5.5,anthropic,measured,"claude subagent, batch of 20",6.1817,estimated,58.0,0.1695,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.95,1,2,,,710.7335,2.814,0.0,0.0,0.0
+openai__gpt-6-luna,GPT-6 Luna,openai,pending,,0.1545,estimated,38.0,0.1702,,,,,,,,,,,,,,,,,
+openai__gpt-6.1-sol,GPT-6.1 Sol,openai,pending,,3.0909,estimated,52.0,0.1698,,,,,,,,,,,,,,,,,
+deepseek__deepseek-flash,DeepSeek V4.1 Flash,deepseek,pending,,0.4179,estimated,45.0,0.1701,,,,,,,,,,,,,,,,,
+qwen__qwen3.7-flash,Qwen3.7 Flash,qwen,pending,,0.0433,estimated,,0.1702,,,,,,,,,,,,,,,,,
+qwen__qwen3.5-plus,Qwen3.5 Plus,qwen,pending,,0.6791,estimated,,0.1701,,,,,,,,,,,,,,,,,

@@ -17,6 +17,20 @@ Sourced inputs are in [`data/pricing.csv`](../data/pricing.csv) and [`data/roi_i
 
 The OpenAI, DeepSeek and Alibaba official pages could not be opened from the build environment, so their prices come from a secondary table that cites them. Qwen model IDs were not listed by the source; confirm them in Model Studio before running.
 
+## Public leaderboard
+
+| Model | Artificial Analysis Intelligence Index | Setting |
+|---|---:|---|
+| Claude Opus 5.5 | 58 | max with fallback |
+| Claude Sonnet 5.5 | 56 | max with fallback |
+| GPT-6.1 Sol | 52 | max |
+| DeepSeek V4.1 Flash | 45 | 1017 (max) |
+| Claude Haiku 5.5 | 43 | max |
+| GPT-6 Luna | 38 | max |
+| Qwen3.7 Flash, Qwen3.5 Plus | not listed | |
+
+Source: [Artificial Analysis model leaderboard](https://artificialanalysis.ai/leaderboards/models), read October 23, 2026. A general reasoning composite, shown for reference only.
+
 ## Labor and exchange rate
 
 | Fact used | Source |

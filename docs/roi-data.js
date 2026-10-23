@@ -142,37 +142,45 @@ window.ROI_DATA = {
    "cost_per_1000": 0.0,
    "cost_basis": "none",
    "critical_error_rate": 0.2,
-   "field_accuracy": 0.9300595238095238
+   "field_accuracy": 0.9300595238095238,
+   "public_index": null,
+   "tested_via": "no API"
   },
   {
    "method": "anthropic__claude-haiku-5-5",
    "name": "Claude Haiku 5.5",
    "provider": "anthropic",
-   "status": "pending",
+   "status": "measured",
    "cost_per_1000": 0.1545431875,
    "cost_basis": "estimated",
-   "critical_error_rate": null,
-   "field_accuracy": null
+   "critical_error_rate": 0.0,
+   "field_accuracy": 1.0,
+   "public_index": 43.0,
+   "tested_via": "claude subagent, batch of 20"
   },
   {
    "method": "anthropic__claude-sonnet-5-5",
    "name": "Claude Sonnet 5.5",
    "provider": "anthropic",
-   "status": "pending",
+   "status": "measured",
    "cost_per_1000": 3.09086375,
    "cost_basis": "estimated",
-   "critical_error_rate": null,
-   "field_accuracy": null
+   "critical_error_rate": 0.00625,
+   "field_accuracy": 0.9970238095238095,
+   "public_index": 56.0,
+   "tested_via": "claude subagent, batch of 20"
   },
   {
    "method": "anthropic__claude-opus-5-5",
    "name": "Claude Opus 5.5",
    "provider": "anthropic",
-   "status": "pending",
+   "status": "measured",
    "cost_per_1000": 6.1817275,
    "cost_basis": "estimated",
-   "critical_error_rate": null,
-   "field_accuracy": null
+   "critical_error_rate": 0.0,
+   "field_accuracy": 1.0,
+   "public_index": 58.0,
+   "tested_via": "claude subagent, batch of 20"
   },
   {
    "method": "openai__gpt-6-luna",
@@ -182,7 +190,9 @@ window.ROI_DATA = {
    "cost_per_1000": 0.1545431875,
    "cost_basis": "estimated",
    "critical_error_rate": null,
-   "field_accuracy": null
+   "field_accuracy": null,
+   "public_index": 38.0,
+   "tested_via": ""
   },
   {
    "method": "openai__gpt-6.1-sol",
@@ -192,7 +202,9 @@ window.ROI_DATA = {
    "cost_per_1000": 3.09086375,
    "cost_basis": "estimated",
    "critical_error_rate": null,
-   "field_accuracy": null
+   "field_accuracy": null,
+   "public_index": 52.0,
+   "tested_via": ""
   },
   {
    "method": "deepseek__deepseek-flash",
@@ -202,7 +214,9 @@ window.ROI_DATA = {
    "cost_per_1000": 0.4179264375,
    "cost_basis": "estimated",
    "critical_error_rate": null,
-   "field_accuracy": null
+   "field_accuracy": null,
+   "public_index": 45.0,
+   "tested_via": ""
   },
   {
    "method": "qwen__qwen3.7-flash",
@@ -212,7 +226,9 @@ window.ROI_DATA = {
    "cost_per_1000": 0.04331608124999999,
    "cost_basis": "estimated",
    "critical_error_rate": null,
-   "field_accuracy": null
+   "field_accuracy": null,
+   "public_index": null,
+   "tested_via": ""
   },
   {
    "method": "qwen__qwen3.5-plus",
@@ -222,7 +238,9 @@ window.ROI_DATA = {
    "cost_per_1000": 0.67911025,
    "cost_basis": "estimated",
    "critical_error_rate": null,
-   "field_accuracy": null
+   "field_accuracy": null,
+   "public_index": null,
+   "tested_via": ""
   }
  ],
  "headline": {

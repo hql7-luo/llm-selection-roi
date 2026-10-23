@@ -86,21 +86,30 @@ def plot_cost_vs_labor(models, labor_saved_1000, manual_cost_1000, path):
     plt.close(fig)
 
 
-# Figure 2: monthly net benefit against critical error rate, cheapest vs priciest model, plus the rules point
-def plot_breakeven(curves, rules_point, breakeven, volume, path):
+# Figure 2: monthly net benefit against critical error rate, cheapest vs priciest model, plus measured points
+def plot_breakeven(curves, rules_point, llm_points, breakeven, volume, path):
     fig, ax = plt.subplots(figsize=(9, 5.2))
     fig.subplots_adjust(left=0.11, right=0.95, top=0.78, bottom=0.16)
-    colors = [BLUE, ORANGE]
-    for (name, xs, ys), color in zip(curves, colors):
+    for (name, xs, ys), color in zip(curves, [BLUE, ORANGE]):
         ax.plot([x * 100 for x in xs], ys, color=color, lw=2, label=name)
     ax.axhline(0, color=AXIS, lw=1)
     ax.axvline(breakeven * 100, color=INK, lw=1)
     ax.text(breakeven * 100 + 0.6, ax.get_ylim()[1] * 0.92, f"Break-even\n{breakeven:.0%} critical errors",
             fontsize=9, color=INK, va="top")
+    signed = lambda v: usd(v) if v >= 0 else "-" + usd(-v)
     rx, ry = rules_point
     ax.plot([rx * 100], [ry], "o", ms=9, color=INK, mec=SURFACE, mew=2, zorder=5)
-    ax.annotate(f"Rules baseline (measured)\n{rx:.0%} errors, {usd(ry) if ry >= 0 else '-' + usd(-ry)}/month",
+    ax.annotate(f"Rules, no AI (measured)\n{rx:.0%} errors, {signed(ry)}/month",
                 (rx * 100, ry), xytext=(16, 14), textcoords="offset points", fontsize=9, color=INK)
+    if llm_points:
+        for e, net in llm_points:
+            ax.plot([e * 100], [net], "o", ms=9, color=INK, mec=SURFACE, mew=2, zorder=5)
+        lo = min(e for e, _ in llm_points)
+        hi = max(e for e, _ in llm_points)
+        top = max(net for _, net in llm_points)
+        ax.annotate(f"Claude models (measured)\n{lo:.1%} to {hi:.1%} errors, about {signed(top)}/month",
+                    (hi * 100, top), xytext=(16, 0), textcoords="offset points", fontsize=9, color=INK,
+                    va="center", ha="left")
     ax.set_xlabel("Critical error rate: share of inquiries with a wrong product, spec, quantity, price or date")
     ax.set_ylabel(f"Net benefit per month at {volume:,.0f} inquiries (USD)")
     ax.yaxis.set_major_formatter(lambda v, _: f"${v:,.0f}" if v >= 0 else f"-${-v:,.0f}")
@@ -187,25 +196,37 @@ def plot_sensitivity(rows, base, path):
     plt.close(fig)
 
 
-# Figure 5 (only after LLM runs exist): measured error rate vs cost for each method
+# Figure 5: measured critical error rate against cost for each tested method
 def plot_measured(methods, breakeven, path):
     fig, ax = plt.subplots(figsize=(9, 5.2))
     fig.subplots_adjust(left=0.11, right=0.95, top=0.78, bottom=0.16)
-    for m in methods:
-        x = max(m["cost_per_1000"], 0.05)
-        ax.plot([x], [m["critical_error_rate"] * 100], "o", ms=9, color=INK if m["method"] == "rules" else BLUE,
-                mec=SURFACE, mew=2)
-        ax.annotate(m["name"], (x, m["critical_error_rate"] * 100), xytext=(8, 4), textcoords="offset points",
-                    fontsize=9, color=INK_2)
+    methods = sorted(methods, key=lambda m: max(m["cost_per_1000"], 0.05))
+    xs = [max(m["cost_per_1000"], 0.05) for m in methods]
+    for i, m in enumerate(methods):
+        x, y = xs[i], m["critical_error_rate"] * 100
+        ax.plot([x], [y], "o", ms=9, color=INK if m["method"] == "rules" else BLUE, mec=SURFACE, mew=2, zorder=5)
+        # Neighbors closer than 3x on the log axis get their labels pushed apart
+        ha, dx = "center", 0
+        if i + 1 < len(xs) and xs[i + 1] / x < 3:
+            ha, dx = "right", 4
+        elif i > 0 and x / xs[i - 1] < 3:
+            ha, dx = "left", -4
+        ax.annotate(f"{m['name']}\n{m['critical_error_rate']:.1%}", (x, y), xytext=(dx, 12), textcoords="offset points",
+                    fontsize=9, color=INK_2, ha=ha, va="bottom")
     ax.axhline(breakeven * 100, color=INK, lw=1)
-    ax.text(0.06, breakeven * 100 + 0.8, "Break-even", fontsize=9, color=INK)
+    ax.text(0.055, breakeven * 100 - 1.2, f"Break-even: {breakeven:.0%}", fontsize=9, color=INK, va="top")
     ax.set_xscale("log")
-    ax.set_xlabel("USD per 1,000 inquiries (log scale; rules shown at $0.05)")
-    ax.set_ylabel("Critical error rate (test set)")
+    ax.set_xlim(0.02, 30)
+    ax.set_ylim(-2, 30)
+    ax.set_xticks([0.05, 0.1, 1, 10], ["no API", "$0.10", "$1", "$10"])
+    ax.set_xlabel("API cost per 1,000 inquiries at list price (log scale)")
+    ax.set_ylabel("Critical error rate (80 test inquiries)")
     ax.yaxis.set_major_formatter(lambda v, _: f"{v:.0f}%")
     ax.grid(color=GRID, lw=0.6)
     ax.set_axisbelow(True)
-    titles(fig, "Measured results: below the line pays off", "Each method on the same 80 test inquiries.")
-    source(fig)
+    titles(fig, "Measured: every Claude model is far under the bar; rules are not",
+           "Claude models run through subagents (batches of 20, two runs each, averaged). Rules use no AI.")
+    source(fig, "Test data was written with Claude's help, so these Claude scores are likely optimistic. "
+                "Other vendors could not be reached from the test environment.")
     fig.savefig(path)
     plt.close(fig)
