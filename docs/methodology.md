@@ -111,7 +111,7 @@ On the three models tested both ways, the leaderboard spread (Haiku 43, Sonnet 5
 
 ## 7. A disputed label
 
-R55 is a Russian inquiry for "термальные пластины CTP" (thermal CTP plates) with no size or thickness. The answer key has no spec, because a plate cannot be quoted without size and thickness. Sonnet's first run wrote "thermal" as the spec, which also fits the prompt's wording ("size, thickness, grade, color or type"). This is the only critical error by any Claude model. The key was not changed after seeing the results.
+R55 is a Russian inquiry for "термальные пластины CTP" (thermal CTP plates) with no size or thickness. The answer key has no spec, because a plate cannot be quoted without size and thickness. Sonnet (first run only), GPT-6.1 Sol (both runs) and GPT-6 Luna (both runs) wrote "thermal" as the spec, which also fits the prompt's wording ("size, thickness, grade, color or type"). These are all of Sonnet's and Sol's critical errors. The key was set before any model ran and was not changed after seeing the results. Counting R55 as correct, Sonnet and Sol have no critical errors and Luna has 9 in 160 (5.6%).
 
 ## 8. Choices made along the way
 
