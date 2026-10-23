@@ -1,0 +1,169 @@
+{
+  "model": "gpt-6-luna",
+  "date": "2026-10-23",
+  "cli_version": "0.163.0-alpha.11.1",
+  "source_commit": "319a93ce38c4eb17f0150c09ccdc4fc574eedeed",
+  "account_default_model": "gpt-6.1-sol",
+  "account_visible_models": [
+    "gpt-6.1-sol",
+    "gpt-6-astra",
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "gpt-5.6-sol",
+    "gpt-5.6-terra",
+    "gpt-5.6-luna"
+  ],
+  "model_inventory_checked_at": "2026-10-23T16:47:40.555798Z",
+  "model_identity_basis": "Explicit CLI --model selection; self-reported MODEL lines are preserved verbatim",
+  "model_reasoning_effort": "medium",
+  "sandbox": "read-only",
+  "web_search": "disabled",
+  "fresh_exec_per_batch": true,
+  "ignore_user_config": true,
+  "ephemeral": true,
+  "batch_directory": "~/llm-batches/gpt-6-luna",
+  "via": "Codex, batch of 20",
+  "api_key_used": false,
+  "actual_cost_measured": false,
+  "authentication": "ChatGPT account login, confirmed by codex login status",
+  "api_key_environment_present": false,
+  "prompt_template": "Read batchK.txt in this folder and follow the instructions inside it. Answer every message yourself by reading it. Do not write or run any code, scripts or regex, and do not search the web. Do not open, list or search any other file or folder. Your final reply must be only the MODEL line followed by the ```jsonl block, exactly as batchK.txt asks.",
+  "batches": [
+    {
+      "run": "run1",
+      "batch": 1,
+      "attempts": 1,
+      "thread_id": "01a169ac-de0d-74d1-9b41-392e9773ff85",
+      "model_reported": "GPT-6",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch1.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "a58a2e8f45c5c5f7a03532377f804f0a5a21ebf3dc1e0b0c97b67d33bad35a7f",
+      "reply_sha256": "d5758b624e145c97a6978d6ad9040cb526275589de09ea029a2d0ea60f053237",
+      "nonfatal_warnings": [
+        "Exceeded skills context budget. All skill descriptions were removed and 27 additional skills were not included in the model-visible skills list."
+      ]
+    },
+    {
+      "run": "run1",
+      "batch": 2,
+      "attempts": 1,
+      "thread_id": "01a169ad-2126-75c1-917e-25911c519159",
+      "model_reported": "gpt-6-luna",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch2.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "cd2aa97ccd9812071218c9c76ab3142cc0eb0c329710cee7ee9ef56e9deed515",
+      "reply_sha256": "b7d91a0d7882001b7586197306b741794387454f4a7115db08c79defff74c38f",
+      "nonfatal_warnings": [
+        "Exceeded skills context budget. All skill descriptions were removed and 27 additional skills were not included in the model-visible skills list."
+      ]
+    },
+    {
+      "run": "run1",
+      "batch": 3,
+      "attempts": 1,
+      "thread_id": "01a169ad-6ef2-7e91-bc78-a9f0f36976f2",
+      "model_reported": "GPT-6 Luna",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch3.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "896bd27f1acfd86898613de1fcc3a35303977ffcbeb6c382b72b780519f365f3",
+      "reply_sha256": "684ada0797cf927951e8e8a9854e4c85744c696cd0601a4a0441036530ed85b3",
+      "nonfatal_warnings": [
+        "Exceeded skills context budget. All skill descriptions were removed and 27 additional skills were not included in the model-visible skills list."
+      ]
+    },
+    {
+      "run": "run1",
+      "batch": 4,
+      "attempts": 1,
+      "thread_id": "01a169ad-ccef-7a03-84ca-e6b5276c1e96",
+      "model_reported": "GPT-6",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch4.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "12d75f5ecd39913eb00f70e64cb2e2961b61e1f8db9f96fc2aa68258859927af",
+      "reply_sha256": "fcd2c74725445d9a32558bb49327b221da1b7554c84ffcac236b26a2e1925f1d",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run2",
+      "batch": 1,
+      "attempts": 1,
+      "thread_id": "01a169ae-08f2-7982-903e-4f03965617c3",
+      "model_reported": "GPT-6",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch1.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "a58a2e8f45c5c5f7a03532377f804f0a5a21ebf3dc1e0b0c97b67d33bad35a7f",
+      "reply_sha256": "45d14e877256c1abb00fbaa9c6dd149abe091d1339614e71907db73eae36010f",
+      "nonfatal_warnings": [
+        "Exceeded skills context budget. All skill descriptions were removed and 27 additional skills were not included in the model-visible skills list."
+      ]
+    },
+    {
+      "run": "run2",
+      "batch": 2,
+      "attempts": 1,
+      "thread_id": "01a169ae-496d-7922-aa9f-4023bec6de6d",
+      "model_reported": "GPT-6",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch2.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "cd2aa97ccd9812071218c9c76ab3142cc0eb0c329710cee7ee9ef56e9deed515",
+      "reply_sha256": "8efdaab9b7944019e350fc86cd5cc108554607d3d4b29162538b2d3d1051656c",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run2",
+      "batch": 3,
+      "attempts": 1,
+      "thread_id": "01a169ae-8bc4-76b2-94a2-d571e96c7c40",
+      "model_reported": "GPT-6",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch3.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "896bd27f1acfd86898613de1fcc3a35303977ffcbeb6c382b72b780519f365f3",
+      "reply_sha256": "0f1164eaebc6fd22accc2cbe5d8196fd6e7401fee2b04fa8c0f7b1b2bd19f590",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run2",
+      "batch": 4,
+      "attempts": 1,
+      "thread_id": "01a169ae-c717-7f81-9560-81e09dba76c9",
+      "model_reported": "GPT-6 Luna",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch4.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "12d75f5ecd39913eb00f70e64cb2e2961b61e1f8db9f96fc2aa68258859927af",
+      "reply_sha256": "a2d17ed5b8b719923b8462aca2c882b6ee6adab300f2b676219df57881509f4b",
+      "nonfatal_warnings": []
+    }
+  ]
+}

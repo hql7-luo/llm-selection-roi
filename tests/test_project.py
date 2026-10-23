@@ -199,6 +199,32 @@ def test_runner_reports_a_missing_key(monkeypatch):
 
 # ---------- ROI ----------
 
+def test_cost_scenarios_count_each_provider_model_once():
+    import run_analysis as analysis
+
+    summary = [
+        {"method": "rules", "provider": "none", "cost_per_1000_usd": 0},
+        {"method": "openai__sample", "provider": "openai", "cost_per_1000_usd": 2},
+        {"method": "codex__sample", "provider": "openai", "cost_per_1000_usd": 2},
+        {"method": "other__sample", "provider": "other", "cost_per_1000_usd": 3},
+        {"method": "custom__one", "provider": "custom", "cost_per_1000_usd": 4},
+        {"method": "custom__two", "provider": "custom", "cost_per_1000_usd": 5},
+        {"method": "unknown", "provider": "unknown", "cost_per_1000_usd": None},
+    ]
+    prices = {method: {"provider": provider, "model_id": "sample"}
+              for method, provider in [("openai__sample", "openai"),
+                                       ("codex__sample", "openai"),
+                                       ("other__sample", "other")]}
+    original = [dict(row) for row in summary]
+
+    scenarios = analysis.cost_scenarios(summary, prices)
+
+    assert [row["method"] for row in scenarios] == ["openai__sample", "other__sample",
+                                                   "custom__one", "custom__two"]
+    assert sum(row["cost_per_1000_usd"] for row in scenarios) == 14
+    assert summary == original
+
+
 def test_breakeven_rate_gives_zero_net_benefit():
     inp = roi.load_inputs()
     for api_cost in (0.0, 0.0002, 0.01):

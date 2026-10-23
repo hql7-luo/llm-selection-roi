@@ -8,3 +8,5 @@ openai__gpt-6.1-sol,GPT-6.1 Sol,openai,pending,,3.0909,estimated,52.0,0.1698,,,,
 deepseek__deepseek-flash,DeepSeek V4.1 Flash,deepseek,pending,,0.4179,estimated,45.0,0.1701,,,,,,,,,,,,,,,,,
 qwen__qwen3.7-flash,Qwen3.7 Flash,qwen,pending,,0.0433,estimated,,0.1702,,,,,,,,,,,,,,,,,
 qwen__qwen3.5-plus,Qwen3.5 Plus,qwen,pending,,0.6791,estimated,,0.1701,,,,,,,,,,,,,,,,,
+codex__gpt-6.1-sol,GPT-6.1 Sol,openai,measured,"Codex, batch of 20",3.0909,estimated,48.0,0.1698,0.0125,0.9955,0.0073,0.0,0.0,0.9875,0.0,1,1,2,,,659.8534,3.031,0.0208,0.0,0.0
+codex__gpt-6-luna,GPT-6 Luna,openai,measured,"Codex, batch of 20",0.1545,estimated,30.0,0.1702,0.0688,0.9784,0.0073,0.0,0.0,0.9375,0.0761,0.7875,0.825,2,,,425.4068,4.7014,0.0729,0.1,0.0

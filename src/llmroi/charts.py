@@ -106,10 +106,11 @@ def plot_breakeven(curves, rules_point, llm_points, breakeven, volume, path):
             ax.plot([e * 100], [net], "o", ms=9, color=INK, mec=SURFACE, mew=2, zorder=5)
         lo = min(e for e, _ in llm_points)
         hi = max(e for e, _ in llm_points)
+        bottom = min(net for _, net in llm_points)
         top = max(net for _, net in llm_points)
-        ax.annotate(f"Claude models (measured)\n{lo:.1%} to {hi:.1%} errors, about {signed(top)}/month",
-                    (hi * 100, top), xytext=(16, 0), textcoords="offset points", fontsize=9, color=INK,
-                    va="center", ha="left")
+        ax.text(0.035, 0.54, f"Tested models (measured errors)\n{lo:.2%} to {hi:.2%} errors\n"
+                f"API-price scenario: {signed(bottom)} to {signed(top)}/month",
+                transform=ax.transAxes, fontsize=9, color=INK, va="top", ha="left")
     ax.set_xlabel("Critical error rate: share of inquiries with a wrong product, spec, quantity, price or date")
     ax.set_ylabel(f"Net benefit per month at {volume:,.0f} inquiries (USD)")
     ax.yaxis.set_major_formatter(lambda v, _: f"${v:,.0f}" if v >= 0 else f"-${-v:,.0f}")
@@ -117,9 +118,10 @@ def plot_breakeven(curves, rules_point, llm_points, breakeven, volume, path):
     ax.grid(color=GRID, lw=0.6)
     ax.set_axisbelow(True)
     ax.legend(frameon=False, loc="upper right", fontsize=9)
-    titles(fig, "Accuracy decides the payoff; model price barely moves the line",
+    titles(fig, "Estimated net benefit falls as critical errors increase",
            "Cheapest vs priciest model with the same workflow (AI draft + human review): the lines almost overlap.")
-    source(fig)
+    source(fig, "Claude and GPT: non-API batches of 20, two runs each. API costs are scenario estimates, not actual Codex costs.\n"
+                + SOURCE)
     fig.savefig(path)
     plt.close(fig)
 
@@ -202,31 +204,41 @@ def plot_measured(methods, breakeven, path):
     fig.subplots_adjust(left=0.11, right=0.95, top=0.78, bottom=0.16)
     methods = sorted(methods, key=lambda m: max(m["cost_per_1000"], 0.05))
     xs = [max(m["cost_per_1000"], 0.05) for m in methods]
+    label_positions = []
     for i, m in enumerate(methods):
         x, y = xs[i], m["critical_error_rate"] * 100
         ax.plot([x], [y], "o", ms=9, color=INK if m["method"] == "rules" else BLUE, mec=SURFACE, mew=2, zorder=5)
-        # Neighbors closer than 3x on the log axis get their labels pushed apart
-        ha, dx = "center", 0
-        if i + 1 < len(xs) and xs[i + 1] / x < 3:
-            ha, dx = "right", 4
-        elif i > 0 and x / xs[i - 1] < 3:
-            ha, dx = "left", -4
-        ax.annotate(f"{m['name']}\n{m['critical_error_rate']:.1%}", (x, y), xytext=(dx, 12), textcoords="offset points",
-                    fontsize=9, color=INK_2, ha=ha, va="bottom")
+        # Stagger labels for nearby points on the log axis, including equal-cost models.
+        label_y = y + 1.3
+        nearby = [py for px, py in label_positions if max(px, x) / min(px, x) < 3]
+        while any(abs(label_y - py) < 3.5 for py in nearby):
+            label_y = max(py + 3.5 for py in nearby if abs(label_y - py) < 3.5)
+        label_positions.append((x, label_y))
+        label_x = x
+        if i + 1 < len(xs) and xs[i + 1] == x and abs(methods[i + 1]["critical_error_rate"] * 100 - y) < 3.5:
+            label_x = x * 1.6
+        elif i > 0 and xs[i - 1] == x and abs(methods[i - 1]["critical_error_rate"] * 100 - y) < 3.5:
+            label_x = x / 2
+        # Use the same four-decimal rate as method_summary.csv for displayed percentages.
+        displayed_rate = round(m["critical_error_rate"], 4)
+        ax.annotate(f"{m['name']}\n{displayed_rate:.2%}", (x, y), xytext=(label_x, label_y), textcoords="data",
+                    fontsize=9, color=INK_2, ha="center", va="bottom",
+                    arrowprops={"arrowstyle": "-", "color": MUTED, "lw": 0.6}
+                    if label_y > y + 1.3 or label_x != x else None)
     ax.axhline(breakeven * 100, color=INK, lw=1)
     ax.text(0.055, breakeven * 100 - 1.2, f"Break-even: {breakeven:.0%}", fontsize=9, color=INK, va="top")
     ax.set_xscale("log")
     ax.set_xlim(0.02, 30)
     ax.set_ylim(-2, 30)
     ax.set_xticks([0.05, 0.1, 1, 10], ["no API", "$0.10", "$1", "$10"])
-    ax.set_xlabel("API cost per 1,000 inquiries at list price (log scale)")
+    ax.set_xlabel("Estimated API cost per 1,000 inquiries at list price (log scale)")
     ax.set_ylabel("Critical error rate (80 test inquiries)")
     ax.yaxis.set_major_formatter(lambda v, _: f"{v:.0f}%")
     ax.grid(color=GRID, lw=0.6)
     ax.set_axisbelow(True)
-    titles(fig, "Measured: every Claude model is far under the bar; rules are not",
-           "Claude models run through subagents (batches of 20, two runs each, averaged). Rules use no AI.")
-    source(fig, "Test data was written with Claude's help, so these Claude scores are likely optimistic. "
-                "Other vendors could not be reached from the test environment.")
+    titles(fig, "Tested models have lower critical error rates than the rules baseline",
+           "Claude and GPT: non-API batches of 20, two runs each, averaged. Rules use no AI.")
+    source(fig, "API costs are scenario estimates, not actual Codex costs. Test data was written with Claude's help,\n"
+                "which may favor Claude. Results cover 80 synthetic inquiries.")
     fig.savefig(path)
     plt.close(fig)

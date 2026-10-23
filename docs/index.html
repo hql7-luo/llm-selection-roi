@@ -226,11 +226,12 @@
       g_method: "Method", method: "Model or method",
       error_rate: "Critical error rate",
       measured: "measured", pending: "not run yet",
-      hint_measured: (n, sub) => sub ? `Measured on ${n} test inquiries through Claude subagents (2 runs).` : `Measured on ${n} test inquiries.`,
+      hint_measured: (n, via) => via.includes("Codex") ? `Measured on ${n} test inquiries through Codex (medium reasoning, 2 runs).` : via.includes("subagent") ? `Measured on ${n} test inquiries through Claude subagents (2 runs).` : `Measured on ${n} test inquiries.`,
       index_hint: (v) => ` Public leaderboard score (Artificial Analysis): ${v}.`,
       hint_moved: (v) => `Measured result: ${v}. The slider is set to a different value to test "what if".`,
       hint_pending: "No test run yet, so this is your estimate. Run the test to replace it.",
       cost_hint: (c, basis) => `API cost about ${c} per 1,000 inquiries (${basis}).`,
+      codex_cost_note: " Actual Codex cost was not measured.",
       basis: { estimated: "estimated from list price", measured: "measured", none: "no API", "n/a": "no API price" },
       g_team: "Your team", monthly_volume: "Inquiries per month", monthly_salary_cny: "Salesperson salary (CNY / month)",
       salary_hint: (h) => `Loaded labor cost about ${h} per hour.`,
@@ -249,7 +250,7 @@
       col_method: "Method", col_cost: "API per 1,000", col_error: "Error rate", col_net: "Net per month", col_payback: "Payback",
       months: "mo", never: "never", est: "(est.)", not_run: "not tested",
       table_note: "Measured rows use their own test result. Models not tested here show no result; select one to try your own error-rate estimate. At these prices, the model's price hardly changes the monthly result.",
-      foot: (d) => `Prices checked ${d}: Anthropic from its pricing page; OpenAI, DeepSeek and Qwen from a secondary price table. Salary: Liepin, Hangzhou. Other inputs are labeled assumptions. Fictional company; not financial advice.`,
+      foot: (d) => `Prices checked ${d}: Anthropic from its official pricing page; GPT (Codex) from OpenAI's official API pricing page; historical GPT (API), DeepSeek and Qwen from secondary price tables. Salary: Liepin, Hangzhou. Other inputs are labeled assumptions. Fictional company; not financial advice.`,
       foot2: "Same model as the Python analysis in the repository; the tests check that both give the same numbers.",
       chart_desc: (be) => `Line chart: monthly net benefit falls as the critical error rate rises and crosses zero at ${be}.`,
       tip: (e, v) => `${e} errors: ${v} per month`,
@@ -264,11 +265,12 @@
       g_method: "方案", method: "模型或方法",
       error_rate: "关键错误率",
       measured: "已实测", pending: "未测试",
-      hint_measured: (n, sub) => sub ? `在 ${n} 份测试询盘上实测（通过 Claude 子代理，跑 2 遍）。` : `在 ${n} 份测试询盘上实测。`,
+      hint_measured: (n, via) => via.includes("Codex") ? `在 ${n} 份测试询盘上实测（通过 Codex，medium 推理档，跑 2 遍）。` : via.includes("subagent") ? `在 ${n} 份测试询盘上实测（通过 Claude 子代理，跑 2 遍）。` : `在 ${n} 份测试询盘上实测。`,
       index_hint: (v) => ` 公开榜单分数（Artificial Analysis）：${v}。`,
       hint_moved: (v) => `实测结果：${v}。滑块已改成别的值，用来做"如果……会怎样"的测算。`,
       hint_pending: "还没有测试结果，这里是你的估计值。跑一次测试即可替换。",
       cost_hint: (c, basis) => `API 成本约每千份 ${c}（${basis}）。`,
+      codex_cost_note: " Codex 实际成本未实测。",
       basis: { estimated: "按标价估算", measured: "实测", none: "不调用 API", "n/a": "没有 API 价格" },
       g_team: "团队情况", monthly_volume: "每月询盘数", monthly_salary_cny: "业务员月薪（元）",
       salary_hint: (h) => `含社保等，人工成本约每小时 ${h}。`,
@@ -287,7 +289,7 @@
       col_method: "方案", col_cost: "每千份 API", col_error: "错误率", col_net: "每月净收益", col_payback: "回本",
       months: "个月", never: "无法回本", est: "（估计）", not_run: "未测试",
       table_note: "已实测的方案用自己的测试结果。这里没测的模型不显示结果，选中后可以用滑块填你估计的错误率。按现在的价格，换贵或便宜的模型对每月结果影响很小。",
-      foot: (d) => `价格查询于 ${d}：Anthropic 来自官方价格页；OpenAI、DeepSeek、Qwen 来自第三方价格汇总。薪资：猎聘杭州。其他输入均标为假设。公司为虚构，不构成财务建议。`,
+      foot: (d) => `价格查询于 ${d}：Anthropic 来自官方价格页；GPT (Codex) 来自 OpenAI 官方 API 价格页；历史 GPT (API)、DeepSeek、Qwen 来自第三方价格汇总。薪资：猎聘杭州。其他输入均标为假设。公司为虚构，不构成财务建议。`,
       foot2: "和仓库里 Python 分析使用同一个模型；测试会检查两边数字一致。",
       chart_desc: (be) => `折线图：关键错误率越高，每月净收益越低，在 ${be} 处降到零。`,
       tip: (e, v) => `错误率 ${e}：每月 ${v}`,
@@ -311,7 +313,8 @@
   const cny = (v) => "¥" + Math.round(v).toLocaleString("en-US");
   const T = () => TEXT[state.lang];
   const methodOf = (key) => DATA.methods.find((m) => m.method === key);
-  const nameOf = (m) => (m.method === "rules" && state.lang === "zh" ? "规则基线（不用 AI）" : m.name);
+  const nameOf = (m) => (m.method === "rules" && state.lang === "zh" ? "规则基线（不用 AI）" : m.name)
+    + (m.method.startsWith("codex__") ? " (Codex)" : m.method.startsWith("openai__") ? " (API)" : "");
 
   function format(name, v) {
     if (name === "monthly_volume") return Math.round(v).toLocaleString("en-US");
@@ -356,11 +359,12 @@
     $("method_badge").textContent = m.status === "measured" ? t.measured : t.pending;
     $("method_badge").className = "badge" + (m.status === "measured" ? " measured" : "");
     $("method_hint").textContent = t.cost_hint(priceText(m), t.basis[m.cost_basis] || m.cost_basis)
+      + (m.method.startsWith("codex__") ? t.codex_cost_note : "")
       + (m.public_index ? t.index_hint(m.public_index) : "");
-    const viaSub = (m.tested_via || "").includes("subagent");
+    const via = m.tested_via || "";
     const moved = m.status === "measured" && Math.abs(state.error_rate - m.critical_error_rate) > 1e-9;
     $("error_hint").textContent = m.status !== "measured" ? t.hint_pending
-      : moved ? t.hint_moved(pct(m.critical_error_rate)) : t.hint_measured(DATA.headline.test_inquiries, viaSub);
+      : moved ? t.hint_moved(pct(m.critical_error_rate)) : t.hint_measured(DATA.headline.test_inquiries, via);
     $("error_rate").value = state.error_rate;
     $("error_rate_out").textContent = pct(state.error_rate);
     SLIDERS.forEach((name) => { $(name).value = inp[name]; $(name + "_out").textContent = format(name, inp[name]); });

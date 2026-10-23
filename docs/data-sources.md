@@ -9,13 +9,17 @@ Sourced inputs are in [`data/pricing.csv`](../data/pricing.csv) and [`data/roi_i
 | Claude Haiku 5.5 | 0.10 | 0.50 | [Anthropic pricing page](https://platform.claude.com/docs/en/about-claude/pricing) (official; rate for prompts up to 100K tokens) |
 | Claude Sonnet 5.5 | 2.00 | 10.00 | same |
 | Claude Opus 5.5 | 4.00 | 20.00 | same |
-| GPT-6 Luna (`gpt-6-luna`) | 0.10 | 0.50 | [BenchLM OpenAI price table](https://benchlm.ai/openai/api-pricing), synced Oct 20, 2026, citing developers.openai.com/api/docs/pricing |
-| GPT-6.1 Sol (`gpt-6.1-sol`) | 2.00 | 10.00 | same |
+| GPT-6 Luna (`openai__gpt-6-luna`, pending API test) | 0.10 | 0.50 | [BenchLM OpenAI price table](https://benchlm.ai/openai/api-pricing), synced Oct 20, 2026, citing developers.openai.com/api/docs/pricing; original reference row retained |
+| GPT-6.1 Sol (`openai__gpt-6.1-sol`, pending API test) | 2.00 | 10.00 | same |
+| GPT-6.1 Sol (`codex__gpt-6.1-sol`) | 2.00 | 10.00 | [OpenAI API pricing](https://developers.openai.com/api/docs/pricing) (official; Standard, short context; checked October 23, 2026) |
+| GPT-6 Luna (`codex__gpt-6-luna`) | 0.10 | 0.50 | same |
 | DeepSeek V4.1 Flash (`deepseek-flash`) | 0.30 | 1.20 | [BenchLM DeepSeek price table](https://benchlm.ai/deepseek/api-pricing), citing api-docs.deepseek.com; peak-hour rate, off-peak is half |
 | Qwen3.7 Flash | 0.03 | 0.13 | [BenchLM Alibaba price table](https://benchlm.ai/alibaba/api-pricing), synced Oct 20, 2026, citing Alibaba Model Studio; international rate |
 | Qwen3.5 Plus | 0.40 | 2.40 | same |
 
-The OpenAI, DeepSeek and Alibaba official pages could not be opened from the build environment, so their prices come from a secondary table that cites them. Qwen model IDs were not listed by the source; confirm them in Model Studio before running.
+The two `codex__` rows use official OpenAI API reference prices for Standard processing with up to 272K input tokens. The [GPT-6.1 Sol model page](https://developers.openai.com/api/docs/models/gpt-6.1-sol) and [GPT-6 Luna model page](https://developers.openai.com/api/docs/models/gpt-6-luna) also confirm these rates. Both models were tested in Codex in batches of 20 at medium reasoning. These were not API tests, and Codex cost was not measured. The reference token prices do not establish the cost of these Codex runs.
+
+The original `openai__` rows remain as historical pricing references for pending API tests; their values came from the cited secondary table. The official OpenAI pages were opened and verified on October 23, 2026 for the new Codex rows. DeepSeek and Alibaba prices still come from secondary tables because their official pages could not be opened during the original collection. Qwen model IDs were not listed by the source; confirm them in Model Studio before running.
 
 ## Public leaderboard
 
@@ -23,13 +27,15 @@ The OpenAI, DeepSeek and Alibaba official pages could not be opened from the bui
 |---|---:|---|
 | Claude Opus 5.5 | 58 | max with fallback |
 | Claude Sonnet 5.5 | 56 | max with fallback |
-| GPT-6.1 Sol | 52 | max |
+| GPT-6.1 Sol (`openai__`, historical reference) | 52 | max |
 | DeepSeek V4.1 Flash | 45 | 1017 (max) |
 | Claude Haiku 5.5 | 43 | max |
-| GPT-6 Luna | 38 | max |
+| GPT-6 Luna (`openai__`, historical reference) | 38 | max |
+| GPT-6.1 Sol (`codex__gpt-6.1-sol`) | 48 | medium; Intelligence Index v4.3.2 |
+| GPT-6 Luna (`codex__gpt-6-luna`) | 30 | medium; Intelligence Index v4.3.2 |
 | Qwen3.7 Flash, Qwen3.5 Plus | not listed | |
 
-Source: [Artificial Analysis model leaderboard](https://artificialanalysis.ai/leaderboards/models), read October 23, 2026. A general reasoning composite, shown for reference only.
+Source: [Artificial Analysis model leaderboard](https://artificialanalysis.ai/leaderboards/models), read October 23, 2026. The new medium entries are also documented on the [GPT-6.1 Sol medium page](https://artificialanalysis.ai/models/gpt-6-1-sol-medium) and [GPT-6 Luna medium page](https://artificialanalysis.ai/models/gpt-6-luna-medium), checked October 23, 2026. These are public API benchmark scores from a general reasoning composite, shown for reference only. They are not inquiry extraction scores or Codex benchmarks. The max entries remain as historical references and use a different reasoning setting from this Codex test.
 
 ## Labor and exchange rate
 

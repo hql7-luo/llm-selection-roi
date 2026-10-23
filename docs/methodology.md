@@ -43,7 +43,15 @@ Labeling decisions worth knowing:
 - Each model did the 4 batches twice (24 subagent runs in total). Replies are saved unchanged in `runs/<model>/raw/` and converted to the same run files the API runner writes, so scoring is identical.
 - Differences from the API route: 20 messages per request instead of one; the subagent has its own system prompt and default settings (no temperature 0); no token counts or response times are reported, so cost is estimated from list prices and speed is not measured.
 
-**Other vendors**: OpenAI, DeepSeek and Alibaba could not be reached from the build environment, so they are compared on list price and a public leaderboard score only (section 6).
+**GPT models through Codex**: GPT-6.1 Sol and GPT-6 Luna were tested on October 23, 2026 using Codex CLI 0.163.0-alpha.11.1 with account login and no API key. Sol was the account's configured default model; Luna was selected as a smaller, lower-priced alternative. Both used `model_reasoning_effort=medium`, since Luna does not support the account's `ultra` setting.
+
+- Each model did the same 80 test inquiries twice, in four batches of 20 per run. The batch folders were outside this repository.
+- Each batch used a fresh `codex exec` instance with an explicit model, `--sandbox read-only`, `--skip-git-repo-check`, `--ephemeral`, and `--output-last-message`. User configuration was excluded and web search was disabled. The instance was instructed to read only its batch file and answer directly, without code, scripts, regex or web searches. The coordinating agent did not answer the inquiries or edit replies.
+- Raw replies are preserved in `runs/codex__<model>/raw/`. Each batch was checked for 20 valid JSON lines and unique, matching IDs and imported with `batches.py`. The execution records in each method folder document the settings, file reads and reply hashes.
+- Every batch completed on its first attempt. Four Luna sessions reported a nonfatal warning that skill descriptions exceeded the context budget and were trimmed. Some Luna replies named the model only as `GPT-6`; model identity follows the explicit CLI selection, and these self-reported lines were left unchanged.
+- These are Codex batch tests, not API tests. The imported records contain no API token counts or per-inquiry timings. API costs and ROI are scenarios based on official list prices and the project's token estimate; actual Codex cost was not measured. The shared single-inquiry token estimate does not measure batching savings, caching or model-specific reasoning usage. Agent system prompts and settings differ from the Claude subagent route, so this does not isolate model effects.
+
+**Untested API routes**: DeepSeek and Qwen remain untested. The `openai__` folders also remain pending API routes; the measured GPT results use separate `codex__` methods. They are the same model identities, not additional models. Cost-only scenarios count each provider/model ID once.
 
 ## 4. Scoring
 
@@ -61,7 +69,9 @@ Code: [`scoring.py`](../src/llmroi/scoring.py) and [`evaluate.py`](../src/llmroi
 | Weighted error | Sum of [field weights](../data/field_weights.csv) of wrong fields per inquiry (quantity and product 5, spec 4, price and delivery 3, ...). |
 | Fabrication rate | Of the places where the message gives no value, the share where the method filled one in anyway. |
 | Priority accuracy, missed-high rate | From the 3 × 3 confusion matrix ([`results/priority_confusion.csv`](../results/priority_confusion.csv)). |
-| JSON failure rate, consistency | Share of unreadable outputs; share of inquiries with identical output in every run, and share with the same right/wrong result on every field in every run (the spec may be worded differently). |
+| JSON failure rate | Share of unreadable outputs. |
+| Output consistency (`consistency`) | Share of inquiries with identical normalized output in every run, excluding the priority explanation. Different spec wording can reduce this rate. |
+| Score consistency (`score_consistency`) | Share with the same right/wrong result on every field in every run. This can be identical even when the output values differ. |
 | Cost, latency | From the token counts and timing the API reports. Before a run, cost is estimated from list prices: input tokens are about 4 characters each for English and 2.5 for Russian; output is set to twice the length of a correct answer. |
 
 ## 5. ROI model
@@ -95,7 +105,7 @@ With the base case: hourly cost $9.70 (¥8,672 x 1.30 / 174 h / 6.6781), 6 minut
 
 ## 6. Public leaderboard scores
 
-[`data/public_benchmarks.csv`](../data/public_benchmarks.csv) lists the Artificial Analysis Intelligence Index for each model, taken at the highest reasoning setting listed on October 23, 2026. It is a broad reasoning composite, not an extraction test, so it is shown for reference only and is not turned into an error rate.
+[`data/public_benchmarks.csv`](../data/public_benchmarks.csv) lists the Artificial Analysis Intelligence Index, checked on October 23, 2026. The Codex method rows use the public API model's medium setting (Sol 48, Luna 30, Index v4.3.2), matching the named reasoning setting in this experiment. Existing rows retain their highest listed settings. These settings and routes are shown explicitly because the scores are not directly interchangeable. The index is a broad composite, not an inquiry extraction test or a Codex benchmark, and is not turned into an error rate.
 
 On the three models tested both ways, the leaderboard spread (Haiku 43, Sonnet 56, Opus 58) did not show up on this task (0.0%, 0.6%, 0.0% critical errors). For a narrow, well-specified extraction job, a general leaderboard is a weak guide; a small test on your own messages is a better one.
 

@@ -38,6 +38,18 @@ def _round(value):
     return round(value, 4) if isinstance(value, float) else value
 
 
+def cost_scenarios(summary, prices):
+    """Count each provider/model once in API cost scenarios; keep every method in the summary."""
+    models = {}
+    for row in summary:
+        if row["method"] == "rules" or row["cost_per_1000_usd"] is None:
+            continue
+        price = prices.get(row["method"], {})
+        key = (price.get("provider") or row["provider"], price.get("model_id") or row["method"])
+        models.setdefault(key, row)
+    return list(models.values())
+
+
 # What a correct answer looks like as model output, to estimate output tokens
 def answer_text(gold):
     answer = json.loads(json.dumps({k: v for k, v in gold.items() if k != "id"}))
@@ -131,7 +143,7 @@ def main():
     write_csv(RESULTS / "rules_mistakes.csv", mistakes)
 
     # 3) ROI: break-even curve, sensitivity, headline numbers
-    llms = [r for r in summary if r["method"] != "rules" and r["cost_per_1000_usd"] is not None]
+    llms = cost_scenarios(summary, prices)
     cheapest = min(llms, key=lambda r: r["cost_per_1000_usd"])
     priciest = max(llms, key=lambda r: r["cost_per_1000_usd"])
     rates = [i / 200 for i in range(0, 81)]                  # 0% to 40%

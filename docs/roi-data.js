@@ -241,6 +241,30 @@ window.ROI_DATA = {
    "field_accuracy": null,
    "public_index": null,
    "tested_via": ""
+  },
+  {
+   "method": "codex__gpt-6.1-sol",
+   "name": "GPT-6.1 Sol",
+   "provider": "openai",
+   "status": "measured",
+   "cost_per_1000": 3.09086375,
+   "cost_basis": "estimated",
+   "critical_error_rate": 0.0125,
+   "field_accuracy": 0.9955357142857143,
+   "public_index": 48.0,
+   "tested_via": "Codex, batch of 20"
+  },
+  {
+   "method": "codex__gpt-6-luna",
+   "name": "GPT-6 Luna",
+   "provider": "openai",
+   "status": "measured",
+   "cost_per_1000": 0.1545431875,
+   "cost_basis": "estimated",
+   "critical_error_rate": 0.06875,
+   "field_accuracy": 0.9784226190476191,
+   "public_index": 30.0,
+   "tested_via": "Codex, batch of 20"
   }
  ],
  "headline": {
