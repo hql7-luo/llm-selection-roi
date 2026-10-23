@@ -1,0 +1,10 @@
+product_key,name,unit,moq
+ctp_plate,CTP plate,sqm,1000
+ps_plate,PS plate,sqm,1000
+blanket,printing blanket,pcs,50
+offset_ink,offset ink,kg,500
+fountain_solution,fountain solution,L,400
+folding_carton,folding carton,pcs,10000
+corrugated_box,corrugated box,pcs,5000
+paper_bag,paper bag,pcs,5000
+label,self-adhesive label,pcs,50000

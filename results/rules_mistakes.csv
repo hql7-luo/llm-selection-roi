@@ -1,0 +1,20 @@
+id,difficulty,critical_error,wrong_fields,invented_items
+R02,regular,False,destination missing_info,0
+R11,regular,True,missing_info priority,1
+R30,regular,True,priority,1
+R44,regular,True,spec quantity target_price destination missing_info,1
+R45,regular,False,destination missing_info,0
+R57,regular,True,destination missing_info,1
+R58,regular,False,destination missing_info,0
+R60,regular,True,,1
+H04,hard,True,quantity target_price,0
+H05,hard,True,spec quantity missing_info priority,0
+H08,hard,True,delivery missing_info,0
+H09,hard,True,quantity priority,0
+H12,hard,True,quantity missing_info priority,0
+H13,hard,True,quantity missing_info priority,0
+H15,hard,True,delivery missing_info,0
+H16,hard,True,quantity delivery missing_info priority,0
+H18,hard,True,quantity missing_info priority,0
+H19,hard,True,delivery missing_info,0
+H21,hard,True,quantity target_price missing_info priority,0

@@ -1,0 +1,21 @@
+metric,value
+hourly_cost_usd,9.702
+manual_cost_per_1000_usd,970.1982
+labor_saved_per_1000_usd,727.6486
+breakeven_error_rate_median_model,0.1701
+breakeven_error_rate_cheapest,0.1702
+breakeven_error_rate_priciest,0.1695
+cheapest_model,Qwen3.7 Flash
+cheapest_cost_per_1000_usd,0.0433
+priciest_model,Claude Opus 5.5
+priciest_cost_per_1000_usd,6.1817
+priciest_share_of_labor_saved,0.0085
+rules_critical_error_rate,0.2
+rules_field_accuracy,0.9301
+rules_net_per_month_usd,-124.9836
+value_of_one_point_per_month_usd,41.9404
+price_gap_priciest_vs_cheapest_per_month_usd,3.0692
+cost_to_test_all_models_3_runs_usd,3.3151
+estimated_input_tokens,783.7131
+estimated_output_tokens,152.3438
+test_inquiries,80

@@ -1,0 +1,14 @@
+name,value,low,high,unit,kind,source,note
+monthly_salary_cny,8672,7000,11000,CNY per month,sourced,"Liepin salary page, Hangzhou foreign-trade salesperson (外贸部业务员), 4,443 postings over the past year; checked 2026-10-23",Zhejiang reference; Wenzhou or smaller cities may be lower
+employer_overhead,1.30,1.20,1.45,x salary,assumption,,"Social insurance, housing fund and other employer costs on top of salary"
+hours_per_month,174,174,174,hours,sourced,"China's official 21.75 paid days per month (月计薪天数, used to convert monthly pay to daily and hourly pay) x 8 hours",
+usd_cny,6.6781,6.6781,6.6781,CNY per USD,sourced,"USD/CNY on 2026-10-22, Pound Sterling Live daily history",
+manual_minutes,6,3,10,minutes per inquiry,assumption,,"Read the message, type the details into the tracker, decide priority"
+review_minutes,1.5,0.75,3,minutes per inquiry,assumption,,"Check the AI's fields against the message when it is right"
+fix_minutes,3,1,6,minutes per caught error,assumption,,"Extra time to correct an inquiry with a critical error that the reviewer catches"
+catch_rate,0.80,0.60,0.95,share,assumption,,"Share of critical errors the reviewer catches before a quote goes out"
+manual_error_rate,0.02,0.00,0.05,share,assumption,,"Share of inquiries handled fully by hand where a critical mistake still reaches the customer (no second check)"
+escaped_error_cost_usd,40,10,150,USD per escaped error,assumption,,"Average cost when a wrong quantity, spec, price or date reaches a customer: re-quoting, delay, sometimes a lost order"
+monthly_volume,500,100,2000,inquiries per month,assumption,,"A small export team of 3 to 5 salespeople"
+setup_cost_usd,2000,1000,5000,USD one-time,assumption,,"Building the prompt, the tracker connection and a first round of testing"
+monthly_maintenance_usd,50,0,200,USD per month,assumption,,"Prompt updates and spot checks"

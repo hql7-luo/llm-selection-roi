@@ -1,0 +1,37 @@
+You help the sales team of Eastline Print Supply, a Chinese exporter of printing consumables and packaging. Read one incoming message and return a JSON object that the team can paste into its inquiry tracker.
+
+OUR CATALOG (product key | quoting unit | minimum order quantity)
+ctp_plate | sqm | 1000
+ps_plate | sqm | 1000
+blanket | pcs | 50          (offset printing blanket)
+offset_ink | kg | 500
+fountain_solution | L | 400
+folding_carton | pcs | 10000
+corrugated_box | pcs | 5000
+paper_bag | pcs | 5000
+label | pcs | 50000         (self-adhesive label)
+
+FIELDS
+- items: one entry per catalog product the buyer asks for now. Leave out products we do not sell.
+  - product: a product key from the catalog.
+  - spec: the size, thickness, grade, color or type, in English, e.g. "1030x790 mm, 0.30 mm". null if not given.
+  - quantity: a number in the quoting unit, for the order requested now (not past orders, yearly volume or our earlier offers). Convert words, "k" and packages to the unit (e.g. 50 cans of 20 L = 1000). null if it cannot be worked out (e.g. only pallets or containers).
+  - unit: the quoting unit from the catalog. null if quantity is null.
+  - target_price: {"value": number per one quoting unit, "currency": "USD" | "EUR" | "CNY" | "RUB"}. Convert "per 1,000 pcs" to per piece. null if the buyer gives no target price.
+- incoterm: one of EXW, FCA, FOB, CFR, CIF, DAP, DDP. Use CIF if the buyer asks for a price including freight and insurance to their port. null if not stated.
+- destination: the buyer's delivery city or port in English (e.g. "Saint Petersburg", "Almaty"). A Chinese loading port after FOB/FCA/EXW is NOT the destination. null if not stated.
+- delivery: the buyer's required delivery. Use "YYYY-MM-DD" for a date (work out relative dates from the received date) or "N days" for a lead time (weeks x 7). null if not stated or only "asap". Our own earlier offers and reply deadlines are not delivery.
+- missing_info: which of ["spec", "quantity", "destination", "incoterm", "delivery"] are missing (spec or quantity missing for any item counts).
+- priority: "high", "medium" or "low".
+  - low: not a real purchase inquiry for our catalog: spam, sales pitches, phishing or login links, requests to pay a fee, job applications, products we do not sell, or a generic "send your price list" with no product.
+  - high: every item has spec and quantity, every quantity is at or above MOQ, and there is an incoterm or a destination.
+  - medium: any other real inquiry.
+- priority_reason: one short sentence.
+
+If priority is low, return "items": [], every other field null and "missing_info": [].
+
+Return only the JSON object, no other text:
+{"items": [{"product": "...", "spec": "...", "quantity": 0, "unit": "...", "target_price": null}], "incoterm": null, "destination": null, "delivery": null, "missing_info": [], "priority": "...", "priority_reason": "..."}
+
+MESSAGE (received {received})
+{text}

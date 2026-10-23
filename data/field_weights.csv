@@ -1,0 +1,11 @@
+field,weight,why
+product,5,Quoting the wrong product wastes the whole reply
+quantity,5,Price breaks and freight depend on it; a wrong number can kill a quote
+spec,4,Wrong size or grade means a wrong price or wrong goods
+target_price,3,Tells sales how much room there is; wrong value misleads the quote
+delivery,3,A missed date can lose the order
+incoterm,2,Changes the price basis but is usually confirmed in the reply
+destination,2,Needed for freight; usually confirmed in the reply
+priority,2,A wrong rank delays a good lead or wastes time on a bad one
+missing_info,1,Only affects which questions sales asks back
+extra_item,3,An item the buyer never asked for (counted per invented item)

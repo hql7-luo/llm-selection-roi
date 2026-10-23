@@ -1,0 +1,10 @@
+method,provider,model,model_id,input_usd_per_mtok,output_usd_per_mtok,source,source_url,checked,note
+rules,none,Rules baseline (no AI),,0,0,No API calls,,2026-10-23,Runs on any laptop
+anthropic__claude-haiku-5-5,anthropic,Claude Haiku 5.5,claude-haiku-5-5,0.10,0.50,Anthropic pricing page (official),https://platform.claude.com/docs/en/about-claude/pricing,2026-10-23,Rate for prompts up to 100K tokens
+anthropic__claude-sonnet-5-5,anthropic,Claude Sonnet 5.5,claude-sonnet-5-5,2.00,10.00,Anthropic pricing page (official),https://platform.claude.com/docs/en/about-claude/pricing,2026-10-23,
+anthropic__claude-opus-5-5,anthropic,Claude Opus 5.5,claude-opus-5-5,4.00,20.00,Anthropic pricing page (official),https://platform.claude.com/docs/en/about-claude/pricing,2026-10-23,
+openai__gpt-6-luna,openai,GPT-6 Luna,gpt-6-luna,0.10,0.50,BenchLM price table (synced 2026-10-20) citing OpenAI's pricing page,https://benchlm.ai/openai/api-pricing,2026-10-23,Secondary source: check developers.openai.com/api/docs/pricing
+openai__gpt-6.1-sol,openai,GPT-6.1 Sol,gpt-6.1-sol,2.00,10.00,BenchLM price table (synced 2026-10-20) citing OpenAI's pricing page,https://benchlm.ai/openai/api-pricing,2026-10-23,Secondary source: check developers.openai.com/api/docs/pricing
+deepseek__deepseek-flash,deepseek,DeepSeek V4.1 Flash,deepseek-flash,0.30,1.20,BenchLM price table citing DeepSeek's pricing page,https://benchlm.ai/deepseek/api-pricing,2026-10-23,Peak-hour rate; off-peak is half. Secondary source: check api-docs.deepseek.com
+qwen__qwen3.7-flash,qwen,Qwen3.7 Flash,qwen3.7-flash,0.03,0.13,BenchLM price table (synced 2026-10-20) citing Alibaba Model Studio pricing,https://benchlm.ai/alibaba/api-pricing,2026-10-23,International rate. Model ID not listed by the source: confirm in Model Studio before running
+qwen__qwen3.5-plus,qwen,Qwen3.5 Plus,qwen3.5-plus,0.40,2.40,BenchLM price table (synced 2026-10-20) citing Alibaba Model Studio pricing,https://benchlm.ai/alibaba/api-pricing,2026-10-23,International rate. Model ID not listed by the source: confirm in Model Studio before running

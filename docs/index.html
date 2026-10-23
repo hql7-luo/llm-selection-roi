@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Selection ROI</title>
+<meta name="description" content="Is an LLM worth it for export inquiry handling? Set team size, labor cost and model accuracy to see the monthly net benefit and the break-even error rate.">
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --surface-2: #f3f2ee;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --border: rgba(11, 11, 11, 0.10);
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --good: #006300;
+    --bad: #b42828;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --surface-2: #232321; --ink: #f0efec; --ink-2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --axis: #383835; --border: rgba(255, 255, 255, 0.10);
+      --series-1: #3987e5; --series-2: #d95926; --good: #0ca30c; --bad: #e66767;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --surface-2: #232321; --ink: #f0efec; --ink-2: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835; --border: rgba(255, 255, 255, 0.10);
+    --series-1: #3987e5; --series-2: #d95926; --good: #0ca30c; --bad: #e66767;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.5;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 16px 48px; }
+  header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 24px; }
+  .eyebrow { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+  h1 { font-size: 28px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .lede { color: var(--ink-2); margin: 0; max-width: 660px; }
+  .top-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+  .seg button { border: 0; background: transparent; color: var(--ink-2); padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+  a { color: inherit; }
+  .link { font-size: 13px; color: var(--ink-2); text-decoration: none; border-bottom: 1px solid var(--axis); }
+
+  .grid { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; min-width: 0; }
+  .card h2 { font-size: 14px; margin: 0 0 14px; color: var(--ink-2); font-weight: 600; }
+  .stack { display: grid; gap: 16px; min-width: 0; }
+
+  .control { margin-bottom: 16px; }
+  .control:last-child { margin-bottom: 0; }
+  .control label { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-2); margin-bottom: 4px; gap: 8px; }
+  .control output { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .control input[type=range] { width: 100%; accent-color: var(--ink); }
+  select { width: 100%; font: inherit; font-size: 14px; padding: 7px 8px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--ink); }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--border); color: var(--ink-2); }
+  .badge.measured { border-color: var(--ink); color: var(--ink); }
+  .group-title { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 20px 0 10px; }
+  .group-title:first-of-type { margin-top: 0; }
+  .reset { margin-top: 18px; font: inherit; font-size: 13px; background: transparent; color: var(--ink-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+
+  .verdict .label { font-size: 13px; color: var(--ink-2); margin: 0; }
+  .big { font-size: 34px; font-weight: 700; margin: 2px 0 0; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .sub { font-size: 14px; margin: 2px 0 0; }
+  .sub.good { color: var(--good); } .sub.bad { color: var(--bad); }
+  .deltas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--grid); }
+  @media (max-width: 520px) { .deltas { grid-template-columns: 1fr 1fr; } }
+  .delta { font-size: 12px; color: var(--ink-2); }
+  .delta strong { display: block; font-size: 18px; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-weight: 600; font-size: 12px; color: var(--muted); padding: 0 0 8px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+  td { padding: 8px 0; border-bottom: 1px solid var(--grid); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; padding-left: 12px; white-space: nowrap; }
+  tr.current td { font-weight: 700; }
+  tr:last-child td { border-bottom: 0; }
+  td .badge { margin-left: 6px; }
+
+  #chart { width: 100%; display: block; overflow: visible; touch-action: pan-y; }
+  #chart text { font-family: inherit; }
+  .tooltip { position: fixed; pointer-events: none; background: var(--ink); color: var(--surface); font-size: 12px;
+    padding: 6px 8px; border-radius: 6px; opacity: 0; transition: opacity .1s; white-space: nowrap; z-index: 10; }
+  footer { margin-top: 24px; font-size: 12px; color: var(--muted); }
+  footer p { margin: 4px 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow" data-i18n="eyebrow"></p>
+      <h1 data-i18n="title"></h1>
+      <p class="lede" data-i18n="lede"></p>
+    </div>
+    <div class="top-actions">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="zh" aria-pressed="false">中文</button>
+      </div>
+      <a class="link" href="https://github.com/hql7-luo/llm-selection-roi" data-i18n="repo"></a>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="controls-title">
+      <h2 id="controls-title" data-i18n="controls"></h2>
+
+      <div class="group-title" data-i18n="g_method"></div>
+      <div class="control">
+        <label for="method"><span data-i18n="method"></span><span class="badge" id="method_badge"></span></label>
+        <select id="method"></select>
+        <div class="hint" id="method_hint"></div>
+      </div>
+      <div class="control">
+        <label for="error_rate"><span data-i18n="error_rate"></span><output id="error_rate_out"></output></label>
+        <input id="error_rate" type="range" min="0" max="0.4" step="0.0025">
+        <div class="hint" id="error_hint"></div>
+      </div>
+
+      <div class="group-title" data-i18n="g_team"></div>
+      <div class="control"><label for="monthly_volume"><span data-i18n="monthly_volume"></span><output id="monthly_volume_out"></output></label>
+        <input id="monthly_volume" type="range" min="50" max="3000" step="50"></div>
+      <div class="control"><label for="monthly_salary_cny"><span data-i18n="monthly_salary_cny"></span><output id="monthly_salary_cny_out"></output></label>
+        <input id="monthly_salary_cny" type="range" min="4000" max="20000" step="100">
+        <div class="hint" id="salary_hint"></div></div>
+      <div class="control"><label for="manual_minutes"><span data-i18n="manual_minutes"></span><output id="manual_minutes_out"></output></label>
+        <input id="manual_minutes" type="range" min="1" max="15" step="0.5"></div>
+      <div class="control"><label for="review_minutes"><span data-i18n="review_minutes"></span><output id="review_minutes_out"></output></label>
+        <input id="review_minutes" type="range" min="0.25" max="5" step="0.25"></div>
+
+      <div class="group-title" data-i18n="g_errors"></div>
+      <div class="control"><label for="catch_rate"><span data-i18n="catch_rate"></span><output id="catch_rate_out"></output></label>
+        <input id="catch_rate" type="range" min="0.5" max="0.99" step="0.01"></div>
+      <div class="control"><label for="escaped_error_cost_usd"><span data-i18n="escaped_error_cost_usd"></span><output id="escaped_error_cost_usd_out"></output></label>
+        <input id="escaped_error_cost_usd" type="range" min="0" max="200" step="5">
+        <div class="hint" data-i18n="escaped_hint"></div></div>
+      <div class="control"><label for="manual_error_rate"><span data-i18n="manual_error_rate"></span><output id="manual_error_rate_out"></output></label>
+        <input id="manual_error_rate" type="range" min="0" max="0.1" step="0.005">
+        <div class="hint" data-i18n="manual_error_hint"></div></div>
+
+      <div class="group-title" data-i18n="g_fixed"></div>
+      <div class="control"><label for="setup_cost_usd"><span data-i18n="setup_cost_usd"></span><output id="setup_cost_usd_out"></output></label>
+        <input id="setup_cost_usd" type="range" min="0" max="10000" step="250"></div>
+      <div class="control"><label for="monthly_maintenance_usd"><span data-i18n="monthly_maintenance_usd"></span><output id="monthly_maintenance_usd_out"></output></label>
+        <input id="monthly_maintenance_usd" type="range" min="0" max="500" step="10"></div>
+
+      <button type="button" class="reset" id="reset" data-i18n="reset"></button>
+    </section>
+
+    <div class="stack">
+      <section class="card verdict" aria-live="polite">
+        <p class="label" data-i18n="net_label"></p>
+        <p class="big" id="net"></p>
+        <p class="sub" id="net_sub"></p>
+        <div class="deltas">
+          <div class="delta"><span data-i18n="be_label"></span><strong id="be"></strong></div>
+          <div class="delta"><span data-i18n="api_label"></span><strong id="api"></strong></div>
+          <div class="delta"><span data-i18n="hours_label"></span><strong id="hours"></strong></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 data-i18n="chart_title"></h2>
+        <svg id="chart" role="img" aria-labelledby="chart-desc"></svg>
+        <p class="sr-only" id="chart-desc"></p>
+      </section>
+
+      <section class="card">
+        <h2 data-i18n="table_title"></h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th data-i18n="col_method"></th><th class="num" data-i18n="col_cost"></th>
+              <th class="num" data-i18n="col_error"></th><th class="num" data-i18n="col_net"></th>
+              <th class="num" data-i18n="col_payback"></th>
+            </tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <p class="hint" data-i18n="table_note"></p>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    <p id="foot1"></p>
+    <p data-i18n="foot2"></p>
+  </footer>
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<script src="roi-data.js"></script>
+<script src="roi.js"></script>
+<script>
+(function () {
+  const M = window.RoiModel;
+  const DATA = window.ROI_DATA;
+
+  const TEXT = {
+    en: {
+      eyebrow: "Interactive calculator",
+      title: "Is an LLM worth it for export inquiries?",
+      lede: "An LLM drafts the tracker entry for each incoming inquiry and a salesperson checks it. Set your own numbers to see the monthly payoff and how accurate the model has to be.",
+      repo: "Code and method on GitHub ↗",
+      controls: "Assumptions",
+      g_method: "Method", method: "Model or method",
+      error_rate: "Critical error rate",
+      measured: "measured", pending: "not run yet",
+      hint_measured: (n) => `Measured on ${n} test inquiries.`,
+      hint_pending: "No test run yet, so this is your estimate. Run the test to replace it.",
+      cost_hint: (c, basis) => `API cost about ${c} per 1,000 inquiries (${basis}).`,
+      basis: { estimated: "estimated from list price", measured: "measured", none: "no API" },
+      g_team: "Your team", monthly_volume: "Inquiries per month", monthly_salary_cny: "Salesperson salary (CNY / month)",
+      salary_hint: (h) => `Loaded labor cost about ${h} per hour.`,
+      manual_minutes: "Manual handling, minutes each", review_minutes: "Checking an AI draft, minutes",
+      g_errors: "Mistakes", catch_rate: "Reviewer catches AI errors", escaped_error_cost_usd: "Cost when an error reaches a customer",
+      escaped_hint: "Re-quoting, delay, sometimes a lost order.", manual_error_rate: "Manual error rate (no second check)",
+      manual_error_hint: "People make mistakes too; this is the bar AI is compared with.",
+      g_fixed: "Setup", setup_cost_usd: "One-time setup", monthly_maintenance_usd: "Maintenance per month",
+      reset: "Reset to base case",
+      net_label: "Net benefit per month, compared with doing everything by hand",
+      payback: (m) => `Pays back the setup cost in ${m} months.`,
+      loss: "Loses money at this error rate.",
+      be_label: "Break-even error rate", api_label: "API cost per month", hours_label: "Staff hours saved per month",
+      chart_title: "Net benefit per month as the error rate changes",
+      table_title: "Every method at these settings",
+      col_method: "Method", col_cost: "API per 1,000", col_error: "Error rate", col_net: "Net per month", col_payback: "Payback",
+      months: "mo", never: "never",
+      table_note: "Methods not run yet use the error rate from the slider. Their rows are almost the same: at these prices, the model's price hardly changes the result.",
+      foot: (d) => `Prices checked ${d}: Anthropic from its pricing page; OpenAI, DeepSeek and Qwen from a secondary price table. Salary: Liepin, Hangzhou. Other inputs are labeled assumptions. Fictional company; not financial advice.`,
+      foot2: "Same model as the Python analysis in the repository; the tests check that both give the same numbers.",
+      chart_desc: (be) => `Line chart: monthly net benefit falls as the critical error rate rises and crosses zero at ${be}.`,
+      tip: (e, v) => `${e} errors: ${v} per month`,
+      be_mark: "break-even", you: "now",
+    },
+    zh: {
+      eyebrow: "交互计算器",
+      title: "外贸询盘用 LLM 值不值？",
+      lede: "每封询盘先由 LLM 生成登记草稿，业务员再核对。填入你们自己的数字，看每月净收益，以及模型至少要多准才划算。",
+      repo: "GitHub 代码和方法 ↗",
+      controls: "假设条件",
+      g_method: "方案", method: "模型或方法",
+      error_rate: "关键错误率",
+      measured: "已实测", pending: "未测试",
+      hint_measured: (n) => `在 ${n} 份测试询盘上实测。`,
+      hint_pending: "还没有测试结果，这里是你的估计值。跑一次测试即可替换。",
+      cost_hint: (c, basis) => `API 成本约每千份 ${c}（${basis}）。`,
+      basis: { estimated: "按标价估算", measured: "实测", none: "不调用 API" },
+      g_team: "团队情况", monthly_volume: "每月询盘数", monthly_salary_cny: "业务员月薪（元）",
+      salary_hint: (h) => `含社保等，人工成本约每小时 ${h}。`,
+      manual_minutes: "人工处理一封，分钟", review_minutes: "核对 AI 草稿，分钟",
+      g_errors: "出错", catch_rate: "复核能发现的 AI 错误比例", escaped_error_cost_usd: "错误流到客户那里的损失",
+      escaped_hint: "重新报价、延误，有时丢单。", manual_error_rate: "纯人工的错误率（无人复核）",
+      manual_error_hint: "人也会出错，AI 是和这个水平比。",
+      g_fixed: "投入", setup_cost_usd: "一次性搭建成本", monthly_maintenance_usd: "每月维护",
+      reset: "恢复基准假设",
+      net_label: "每月净收益（和全部人工处理相比）",
+      payback: (m) => `${m} 个月收回搭建成本。`,
+      loss: "在这个错误率下会亏钱。",
+      be_label: "盈亏平衡错误率", api_label: "每月 API 成本", hours_label: "每月节省工时",
+      chart_title: "错误率变化时的每月净收益",
+      table_title: "在当前设置下比较所有方案",
+      col_method: "方案", col_cost: "每千份 API", col_error: "错误率", col_net: "每月净收益", col_payback: "回本",
+      months: "个月", never: "无法回本",
+      table_note: "未测试的方案都按滑块上的错误率计算，所以几行结果几乎一样：按现在的价格，换贵或便宜的模型对结果影响很小。",
+      foot: (d) => `价格查询于 ${d}：Anthropic 来自官方价格页；OpenAI、DeepSeek、Qwen 来自第三方价格汇总。薪资：猎聘杭州。其他输入均标为假设。公司为虚构，不构成财务建议。`,
+      foot2: "和仓库里 Python 分析使用同一个模型；测试会检查两边数字一致。",
+      chart_desc: (be) => `折线图：关键错误率越高，每月净收益越低，在 ${be} 处降到零。`,
+      tip: (e, v) => `错误率 ${e}：每月 ${v}`,
+      be_mark: "盈亏平衡", you: "当前",
+    },
+  };
+
+  const BASE = {};
+  DATA.inputs.forEach((row) => { BASE[row.name] = Number(row.value); });
+  const SLIDERS = ["monthly_volume", "monthly_salary_cny", "manual_minutes", "review_minutes", "catch_rate",
+    "escaped_error_cost_usd", "manual_error_rate", "setup_cost_usd", "monthly_maintenance_usd"];
+  const state = { lang: "en", method: "rules", error_rate: 0.2, inp: Object.assign({}, BASE) };
+  const $ = (id) => document.getElementById(id);
+
+  const money = (v, digits) => {
+    const d = digits === undefined ? (Math.abs(v) < 10 ? 2 : 0) : digits;
+    const s = "$" + Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+    return v < 0 ? "-" + s : s;
+  };
+  const pct = (v, d) => (v * 100).toFixed(d === undefined ? 1 : d) + "%";
+  const cny = (v) => "¥" + Math.round(v).toLocaleString("en-US");
+  const T = () => TEXT[state.lang];
+  const methodOf = (key) => DATA.methods.find((m) => m.method === key);
+  const nameOf = (m) => (m.method === "rules" && state.lang === "zh" ? "规则基线（不用 AI）" : m.name);
+
+  function format(name, v) {
+    if (name === "monthly_volume") return Math.round(v).toLocaleString("en-US");
+    if (name === "monthly_salary_cny") return cny(v);
+    if (name === "manual_minutes" || name === "review_minutes") return v + (state.lang === "zh" ? " 分钟" : " min");
+    if (name === "catch_rate" || name === "manual_error_rate") return pct(v, name === "catch_rate" ? 0 : 1);
+    return money(v, 0);
+  }
+
+  function buildSelect() {
+    const sel = $("method");
+    sel.innerHTML = "";
+    DATA.methods.forEach((m) => {
+      const opt = document.createElement("option");
+      opt.value = m.method;
+      opt.textContent = nameOf(m) + (m.status === "measured" ? " ✓" : "");
+      sel.appendChild(opt);
+    });
+    sel.value = state.method;
+  }
+
+  function applyText() {
+    const t = T();
+    document.documentElement.lang = state.lang === "zh" ? "zh-CN" : "en";
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const v = t[el.dataset.i18n];
+      if (typeof v === "string") el.textContent = v;
+    });
+    document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === state.lang)));
+    $("foot1").textContent = t.foot(DATA.checked);
+  }
+
+  function apiCost(m) { return (m.cost_per_1000 || 0) / 1000; }
+
+  function update() {
+    const t = T();
+    const m = methodOf(state.method);
+    const inp = state.inp;
+
+    $("method_badge").textContent = m.status === "measured" ? t.measured : t.pending;
+    $("method_badge").className = "badge" + (m.status === "measured" ? " measured" : "");
+    $("method_hint").textContent = t.cost_hint(money(m.cost_per_1000 || 0, 2), t.basis[m.cost_basis] || m.cost_basis);
+    $("error_hint").textContent = m.status === "measured" ? t.hint_measured(DATA.headline.test_inquiries) : t.hint_pending;
+    $("error_rate").value = state.error_rate;
+    $("error_rate_out").textContent = pct(state.error_rate);
+    SLIDERS.forEach((name) => { $(name).value = inp[name]; $(name + "_out").textContent = format(name, inp[name]); });
+    $("salary_hint").textContent = t.salary_hint(money(M.hourlyCost(inp), 2));
+
+    const r = M.monthly(inp, state.error_rate, apiCost(m));
+    const be = M.breakevenErrorRate(inp, apiCost(m));
+    $("net").textContent = money(r.net_month, 0);
+    const sub = $("net_sub");
+    if (r.payback_months !== null) { sub.textContent = t.payback(r.payback_months.toFixed(1)); sub.className = "sub good"; }
+    else { sub.textContent = t.loss; sub.className = "sub bad"; }
+    $("be").textContent = pct(be);
+    $("api").textContent = money(inp.monthly_volume * apiCost(m), 2);
+    $("hours").textContent = (inp.monthly_volume * r.minutes_saved / 60).toFixed(0) + (state.lang === "zh" ? " 小时" : " h");
+
+    drawTable();
+    drawChart(m, be);
+  }
+
+  function drawTable() {
+    const t = T();
+    const rows = DATA.methods.map((m) => {
+      const e = m.status === "measured" ? m.critical_error_rate : state.error_rate;
+      const r = M.monthly(state.inp, e, apiCost(m));
+      return { m, e, r };
+    });
+    $("rows").innerHTML = rows.map(({ m, e, r }) => `
+      <tr class="${m.method === state.method ? "current" : ""}">
+        <td>${nameOf(m)}<span class="badge${m.status === "measured" ? " measured" : ""}">${m.status === "measured" ? t.measured : t.pending}</span></td>
+        <td class="num">${money(m.cost_per_1000 || 0, 2)}</td>
+        <td class="num">${pct(e)}</td>
+        <td class="num">${money(r.net_month, 0)}</td>
+        <td class="num">${r.payback_months === null ? t.never : r.payback_months.toFixed(1) + " " + t.months}</td>
+      </tr>`).join("");
+  }
+
+  // SVG line chart: net benefit per month (y) against critical error rate (x), with hover readout
+  function drawChart(m, be) {
+    const t = T();
+    const svg = $("chart");
+    const W = Math.max(svg.clientWidth || 640, 280), H = 260;
+    const pad = { l: 64, r: 16, t: 16, b: 36 };
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("height", H);
+    const xs = [], ys = [];
+    for (let i = 0; i <= 80; i++) { xs.push(i / 200); ys.push(M.monthly(state.inp, i / 200, apiCost(m)).net_month); }
+    const yMin = Math.min(0, ...ys), yMax = Math.max(0, ...ys);
+    const span = (yMax - yMin) || 1;
+    const X = (e) => pad.l + (e / 0.4) * (W - pad.l - pad.r);
+    const Y = (v) => pad.t + (1 - (v - yMin) / span) * (H - pad.t - pad.b);
+    const step = niceStep(span / 4);
+    let grid = "";
+    for (let v = Math.ceil(yMin / step) * step; v <= yMax + 1e-9; v += step) {
+      grid += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)" stroke-width="1"/>`
+        + `<text x="${pad.l - 8}" y="${Y(v) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${money(v, 0)}</text>`;
+    }
+    let xt = "";
+    [0, 0.1, 0.2, 0.3, 0.4].forEach((e) => {
+      xt += `<text x="${X(e)}" y="${H - pad.b + 18}" text-anchor="middle" font-size="11" fill="var(--muted)">${pct(e, 0)}</text>`;
+    });
+    const path = xs.map((e, i) => `${i ? "L" : "M"}${X(e).toFixed(1)},${Y(ys[i]).toFixed(1)}`).join("");
+    const cur = M.monthly(state.inp, state.error_rate, apiCost(m)).net_month;
+    const beX = X(Math.min(be, 0.4));
+    svg.innerHTML = grid + xt
+      + `<line x1="${pad.l}" x2="${W - pad.r}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--axis)" stroke-width="1"/>`
+      + (be <= 0.4 ? `<line x1="${beX}" x2="${beX}" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--ink)" stroke-width="1"/>`
+        + `<text x="${beX + 6}" y="${pad.t + 12}" font-size="11" fill="var(--ink)">${t.be_mark} ${pct(be)}</text>` : "")
+      + `<path d="${path}" fill="none" stroke="var(--series-1)" stroke-width="2"/>`
+      + `<circle cx="${X(state.error_rate)}" cy="${Y(cur)}" r="5" fill="var(--series-1)" stroke="var(--surface)" stroke-width="2"/>`
+      + `<text x="${X(state.error_rate) + 8}" y="${Y(cur) - 8}" font-size="11" fill="var(--ink-2)">${t.you}</text>`
+      + `<line id="hover_line" x1="0" x2="0" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--axis)" stroke-width="1" opacity="0"/>`
+      + `<rect id="hit" x="${pad.l}" y="${pad.t}" width="${W - pad.l - pad.r}" height="${H - pad.t - pad.b}" fill="transparent"/>`;
+    $("chart-desc").textContent = t.chart_desc(pct(be));
+
+    const tip = $("tooltip"), line = svg.querySelector("#hover_line"), hit = svg.querySelector("#hit");
+    const move = (ev) => {
+      const box = svg.getBoundingClientRect();
+      const px = (ev.clientX - box.left) * (W / box.width);
+      const e = Math.min(Math.max((px - pad.l) / (W - pad.l - pad.r) * 0.4, 0), 0.4);
+      const v = M.monthly(state.inp, e, apiCost(m)).net_month;
+      line.setAttribute("x1", X(e)); line.setAttribute("x2", X(e)); line.setAttribute("opacity", "1");
+      tip.textContent = t.tip(pct(e), money(v, 0));
+      tip.style.left = Math.min(ev.clientX + 12, window.innerWidth - tip.offsetWidth - 8) + "px";
+      tip.style.top = (ev.clientY - 34) + "px";
+      tip.style.opacity = "1";
+    };
+    hit.addEventListener("pointermove", move);
+    hit.addEventListener("pointerleave", () => { tip.style.opacity = "0"; line.setAttribute("opacity", "0"); });
+  }
+
+  function niceStep(raw) {
+    const p = Math.pow(10, Math.floor(Math.log10(raw)));
+    const n = raw / p;
+    return (n < 1.5 ? 1 : n < 3.5 ? 2.5 : n < 7.5 ? 5 : 10) * p;
+  }
+
+  function selectMethod(key) {
+    state.method = key;
+    const m = methodOf(key);
+    if (m.status === "measured") state.error_rate = m.critical_error_rate;
+    update();
+  }
+
+  // Wire up controls
+  buildSelect();
+  $("method").addEventListener("change", (ev) => selectMethod(ev.target.value));
+  $("error_rate").addEventListener("input", (ev) => { state.error_rate = Number(ev.target.value); update(); });
+  SLIDERS.forEach((name) => $(name).addEventListener("input", (ev) => { state.inp[name] = Number(ev.target.value); update(); }));
+  $("reset").addEventListener("click", () => { state.inp = Object.assign({}, BASE); selectMethod(state.method); });
+  document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
+    state.lang = b.dataset.lang; applyText(); buildSelect(); update();
+  }));
+  window.addEventListener("resize", () => update());
+
+  state.lang = (navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en";
+  applyText();
+  buildSelect();
+  selectMethod("rules");
+})();
+</script>
+</body>
+</html>

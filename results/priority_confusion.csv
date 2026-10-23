@@ -1,0 +1,13 @@
+method,gold,predicted,count
+rules,high,high,38
+rules,high,medium,8
+rules,high,low,0
+rules,high,invalid,0
+rules,medium,high,1
+rules,medium,medium,21
+rules,medium,low,0
+rules,medium,invalid,0
+rules,low,high,0
+rules,low,medium,0
+rules,low,low,12
+rules,low,invalid,0

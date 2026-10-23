@@ -1,0 +1,10 @@
+method,field,all,regular,hard,trap
+rules,product,1.0,1.0,1.0,
+rules,spec,0.9706,0.9792,0.95,
+rules,quantity,0.8676,0.9792,0.6,
+rules,target_price,0.9559,0.9792,0.9,
+rules,incoterm,1.0,1.0,1.0,1.0
+rules,destination,0.9375,0.8958,1.0,1.0
+rules,delivery,0.95,1.0,0.8,1.0
+rules,missing_info,0.8125,0.875,0.55,1.0
+rules,priority,0.8875,0.9583,0.65,1.0
