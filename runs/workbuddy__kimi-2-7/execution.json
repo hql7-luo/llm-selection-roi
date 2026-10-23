@@ -1,0 +1,147 @@
+{
+  "model": "kimi-2-7",
+  "date": "2026-10-23",
+  "cli_version": "unknown",
+  "source_commit": "c58ed4611db3c9ca4d751035f7ef18c4b5cb9251",
+  "model_identity_basis": "model pinned in the WorkBuddy UI; subagents inherit it; not independently verified",
+  "model_reasoning_effort": "WorkBuddy default, not confirmed",
+  "sandbox": "default",
+  "web_search": "disabled",
+  "fresh_exec_per_batch": true,
+  "batch_directory": "~/llm-batches/workbuddy/kimi-2-7",
+  "via": "WorkBuddy subagent, batch of 20",
+  "api_key_used": false,
+  "actual_cost_measured": false,
+  "api_key_environment_present": false,
+  "prompt_template": "Below is batchK.txt. Follow the instructions inside it. Answer every message yourself by reading it. Do not write or run any code, scripts or regex, do not search the web, and do not open, list or search any file. Your final reply must be only the MODEL line followed by the ```jsonl block, exactly as the instructions ask.",
+  "batches": [
+    {
+      "run": "run1",
+      "batch": 1,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "Kimi-K2.7-Code",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch1.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "a58a2e8f45c5c5f7a03532377f804f0a5a21ebf3dc1e0b0c97b67d33bad35a7f",
+      "reply_sha256": "55258b1299a84875c64d3b3a144a4dd685ed0f825a507a4325c3537d6ab05d78",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run1",
+      "batch": 2,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "kimi-k2.7-code",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch2.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "cd2aa97ccd9812071218c9c76ab3142cc0eb0c329710cee7ee9ef56e9deed515",
+      "reply_sha256": "bd34b746de7bbef1bf94e4dd1e3229ab2bf67e3f33e68317c27625fdd081770c",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run1",
+      "batch": 3,
+      "attempts": 2,
+      "thread_id": null,
+      "model_reported": "kimi-k2.7-code",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch3.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "896bd27f1acfd86898613de1fcc3a35303977ffcbeb6c382b72b780519f365f3",
+      "reply_sha256": "e23562291d4830b5dc6765bddc65c195dccfbc8121e06e42f8b1abc2bfb59476",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run1",
+      "batch": 4,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "Kimi-K2.7-Code",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch4.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "12d75f5ecd39913eb00f70e64cb2e2961b61e1f8db9f96fc2aa68258859927af",
+      "reply_sha256": "f181cb48c76d0eff441413134a1b66c0f11f97caac730d8d7197e9861891ea7f",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run2",
+      "batch": 1,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "Kimi-K2.7-Code",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch1.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "a58a2e8f45c5c5f7a03532377f804f0a5a21ebf3dc1e0b0c97b67d33bad35a7f",
+      "reply_sha256": "8630efe97dac6bc88252af5129de65d9f48f7e620fa2e129cc6e366f6997d9bc",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run2",
+      "batch": 2,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "Kimi-K2.7-Code",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch2.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "cd2aa97ccd9812071218c9c76ab3142cc0eb0c329710cee7ee9ef56e9deed515",
+      "reply_sha256": "7189f04f10c600e197061c9b3c7f253d1369ba7a6e990edd63bd35c33ba548b4",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run2",
+      "batch": 3,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "Kimi-K2.7-Code",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch3.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "896bd27f1acfd86898613de1fcc3a35303977ffcbeb6c382b72b780519f365f3",
+      "reply_sha256": "b5e46fdf09ad9fa3a132f78a71d328ff2e27eaf0fc9f986547c9064a09dfc014",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run2",
+      "batch": 4,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "Kimi-K2.7-Code",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch4.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "12d75f5ecd39913eb00f70e64cb2e2961b61e1f8db9f96fc2aa68258859927af",
+      "reply_sha256": "8c8b57ed8ba02624d0a6c3aef5a293894417ba091ea0b239ce0526838a4477a8",
+      "nonfatal_warnings": []
+    }
+  ]
+}

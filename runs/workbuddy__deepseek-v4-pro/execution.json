@@ -1,0 +1,147 @@
+{
+  "model": "deepseek-v4-pro",
+  "date": "2026-10-23",
+  "cli_version": "unknown",
+  "source_commit": "c58ed4611db3c9ca4d751035f7ef18c4b5cb9251",
+  "model_identity_basis": "model pinned in the WorkBuddy UI; subagents inherit it; not independently verified",
+  "model_reasoning_effort": "WorkBuddy default, not confirmed",
+  "sandbox": "default",
+  "web_search": "disabled",
+  "fresh_exec_per_batch": true,
+  "batch_directory": "~/llm-batches/workbuddy/deepseek-v4-pro",
+  "via": "WorkBuddy subagent, batch of 20",
+  "api_key_used": false,
+  "actual_cost_measured": false,
+  "api_key_environment_present": false,
+  "prompt_template": "Below is batchK.txt. Follow the instructions inside it. Answer every message yourself by reading it. Do not write or run any code, scripts or regex, do not search the web, and do not open, list or search any file. Your final reply must be only the MODEL line followed by the ```jsonl block, exactly as the instructions ask.",
+  "batches": [
+    {
+      "run": "run1",
+      "batch": 1,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "deepseek-v4-pro",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch1.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "a58a2e8f45c5c5f7a03532377f804f0a5a21ebf3dc1e0b0c97b67d33bad35a7f",
+      "reply_sha256": "0929f5f2177a9eab47eef086f9d4a5b8eb8362af9b8f962fac27a506c96e8f43",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run1",
+      "batch": 2,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "Deepseek-V4-Pro",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch2.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "cd2aa97ccd9812071218c9c76ab3142cc0eb0c329710cee7ee9ef56e9deed515",
+      "reply_sha256": "d5a59faf3ca1f831125ba199c677b97ed42b39236429080887135f0bc7c2f426",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run1",
+      "batch": 3,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "deepseek-v4-pro",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch3.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "896bd27f1acfd86898613de1fcc3a35303977ffcbeb6c382b72b780519f365f3",
+      "reply_sha256": "60deb0c37fd188036abb5feb4c3026e78b3c7be470968d38cc4bcc23dedd3868",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run1",
+      "batch": 4,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "Deepseek-V4-Pro",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch4.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "12d75f5ecd39913eb00f70e64cb2e2961b61e1f8db9f96fc2aa68258859927af",
+      "reply_sha256": "f54cce2fe16535ba0d8e80e585457bc69689dcd02db85def2411f77cce0e7974",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run2",
+      "batch": 1,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "deepseek-v4-pro",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch1.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "a58a2e8f45c5c5f7a03532377f804f0a5a21ebf3dc1e0b0c97b67d33bad35a7f",
+      "reply_sha256": "fa6563f9ce3c3f38d1d13bf71c7cca200f5eea19b78b535a21a529c814eff956",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run2",
+      "batch": 2,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "Deepseek-V4-Pro",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch2.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "cd2aa97ccd9812071218c9c76ab3142cc0eb0c329710cee7ee9ef56e9deed515",
+      "reply_sha256": "5a109549e560f96db50ec9a1d8f4a8c19e39fb5fc5a1854c70f5378c0cc78d93",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run2",
+      "batch": 3,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "deepseek-v4-pro",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch3.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "896bd27f1acfd86898613de1fcc3a35303977ffcbeb6c382b72b780519f365f3",
+      "reply_sha256": "d500421285de851b096abb23b97d881d86a3bfdf40bed81a5814dbf1f61aabea",
+      "nonfatal_warnings": []
+    },
+    {
+      "run": "run2",
+      "batch": 4,
+      "attempts": 1,
+      "thread_id": null,
+      "model_reported": "Deepseek-V4-Pro",
+      "json_lines": 20,
+      "ids_match_batch": true,
+      "file_reads": [
+        "batch4.txt"
+      ],
+      "other_tools_used": false,
+      "prompt_sha256": "12d75f5ecd39913eb00f70e64cb2e2961b61e1f8db9f96fc2aa68258859927af",
+      "reply_sha256": "6906dcfe53fc87b40e8e95bc51765ec421f55c62e057f5234bdbcb89497e7798",
+      "nonfatal_warnings": []
+    }
+  ]
+}
