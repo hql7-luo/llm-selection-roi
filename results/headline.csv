@@ -15,7 +15,7 @@ rules_field_accuracy,0.9301
 rules_net_per_month_usd,-124.9836
 value_of_one_point_per_month_usd,41.9404
 price_gap_priciest_vs_cheapest_per_month_usd,3.0692
-cost_to_test_all_models_3_runs_usd,3.3151
+cost_to_test_all_models_3_runs_usd,4.0331
 estimated_input_tokens,783.7131
 estimated_output_tokens,152.3438
 test_inquiries,80

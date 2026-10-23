@@ -51,7 +51,15 @@ Labeling decisions worth knowing:
 - Every batch completed on its first attempt. Four Luna sessions reported a nonfatal warning that skill descriptions exceeded the context budget and were trimmed. Some Luna replies named the model only as `GPT-6`; model identity follows the explicit CLI selection, and these self-reported lines were left unchanged.
 - These are Codex batch tests, not API tests. The imported records contain no API token counts or per-inquiry timings. API costs and ROI are scenarios based on official list prices and the project's token estimate; actual Codex cost was not measured. The shared single-inquiry token estimate does not measure batching savings, caching or model-specific reasoning usage. Agent system prompts and settings differ from the Claude subagent route, so this does not isolate model effects.
 
-**Untested API routes**: DeepSeek and Qwen remain untested. The `openai__` folders also remain pending API routes; the measured GPT results use separate `codex__` methods. They are the same model identities, not additional models. Cost-only scenarios count each provider/model ID once.
+**DeepSeek and Kimi through WorkBuddy**: DeepSeek V4 Pro, DeepSeek V4.1 Flash and Kimi K2.7 Code were tested on October 23, 2026 with the built-in models of WorkBuddy (Tencent's AI agent app), using its own credits and no API key.
+
+- A first try asked a subagent for a specific model through a parameter. Its reply named the app's own default model instead, so that answer was thrown away and the method was changed.
+- The final method: one chat per model, with the model chosen by hand in the app's model picker (not Auto). In that chat, a coordinating session read each batch file and pasted the full text into a fresh subagent, which inherits the chat's model and had no file access. Each subagent handled one batch. The coordinating session did not answer or edit anything and did not open this repository.
+- The app does not report which model actually answered, so model identity rests on the picker choice. Every reply's MODEL line named the expected model (`deepseek-v4-pro`, `Deepseek-V4.1-Flash`, `Kimi-K2.7-Code`). The reasoning setting was the app's default and was not confirmed.
+- 23 of 24 batches were right on the first try. Kimi run 1, batch 3 was rerun once in a new subagent because the first reply had a duplicated JSON key; the first reply was not kept. Details and reply hashes are in `runs/workbuddy__<model>/execution.json`.
+- DeepSeek said in September that API requests for V4 Pro would be routed to V4.1 Flash, while its pricing page still lists V4 Pro as served (as summarized by BenchLM). WorkBuddy may serve these models on its own, so which weights answered cannot be checked here. The two did behave differently on this test (see section 7).
+
+**Untested API routes**: Qwen remains untested. The `openai__` and `deepseek__` rows are pending API routes; the measured GPT and DeepSeek results use separate `codex__` and `workbuddy__` methods. They are the same model identities, not additional models. Cost-only scenarios count each provider/model ID once.
 
 ## 4. Scoring
 
@@ -105,15 +113,21 @@ With the base case: hourly cost $9.70 (¥8,672 x 1.30 / 174 h / 6.6781), 6 minut
 
 ## 6. Public leaderboard scores
 
-[`data/public_benchmarks.csv`](../data/public_benchmarks.csv) lists the Artificial Analysis Intelligence Index, checked on October 23, 2026. The Codex method rows use the public API model's medium setting (Sol 48, Luna 30, Index v4.3.2), matching the named reasoning setting in this experiment. Existing rows retain their highest listed settings. These settings and routes are shown explicitly because the scores are not directly interchangeable. The index is a broad composite, not an inquiry extraction test or a Codex benchmark, and is not turned into an error rate.
+[`data/public_benchmarks.csv`](../data/public_benchmarks.csv) lists the Artificial Analysis Intelligence Index, checked on October 23, 2026. The Codex method rows use the public API model's medium setting (Sol 48, Luna 30, Index v4.3.2), matching the named reasoning setting in this experiment. Existing rows retain their highest listed settings. The WorkBuddy rows use the highest setting listed (DeepSeek V4 Pro 36, with 20 for non-reasoning; V4.1 Flash 45), because the app's reasoning setting was not confirmed; Kimi K2.7 Code has a single entry (26). These settings and routes are shown explicitly because the scores are not directly interchangeable. The index is a broad composite, not an inquiry extraction test or a Codex benchmark, and is not turned into an error rate.
 
-On the three models tested both ways, the leaderboard spread (Haiku 43, Sonnet 56, Opus 58) did not show up on this task (0.0%, 0.6%, 0.0% critical errors). For a narrow, well-specified extraction job, a general leaderboard is a weak guide; a small test on your own messages is a better one.
+On the three models tested both ways, the leaderboard spread (Haiku 43, Sonnet 56, Opus 58) did not show up on this task (0.0%, 0.6%, 0.0% critical errors). Across all eight tested models, the two lowest scores (Kimi K2.7 Code 26, GPT-6 Luna 30) did go with the most errors, but DeepSeek V4 Pro (36) made none. For a narrow, well-specified extraction job, a general leaderboard is a weak guide; a small test on your own messages is a better one.
 
 ## 7. A disputed label
 
-R55 is a Russian inquiry for "термальные пластины CTP" (thermal CTP plates) with no size or thickness. The answer key has no spec, because a plate cannot be quoted without size and thickness. Sonnet (first run only), GPT-6.1 Sol (both runs) and GPT-6 Luna (both runs) wrote "thermal" as the spec, which also fits the prompt's wording ("size, thickness, grade, color or type"). These are all of Sonnet's and Sol's critical errors. The key was set before any model ran and was not changed after seeing the results. Counting R55 as correct, Sonnet and Sol have no critical errors and Luna has 9 in 160 (5.6%).
+R55 is a Russian inquiry for "термальные пластины CTP" (thermal CTP plates) with no size or thickness. The answer key has no spec, because a plate cannot be quoted without size and thickness. Sonnet (first run only), GPT-6.1 Sol (both runs), GPT-6 Luna (both runs), DeepSeek V4.1 Flash (both runs) and Kimi K2.7 Code (first run only) wrote "thermal" as the spec, which also fits the prompt's wording ("size, thickness, grade, color or type"). Haiku, Opus and DeepSeek V4 Pro matched the key in both runs. These are all of Sonnet's, Sol's and V4.1 Flash's critical errors. The key was set before any model ran and was not changed after seeing the results. Counting R55 as correct, Sonnet, Sol and V4.1 Flash have no critical errors, Luna has 9 in 160 (5.6%) and Kimi 18 in 160 (11.25%).
 
-## 8. Choices made along the way
+## 8. Good leads ranked too low
+
+The rubric marks an inquiry high when every item has a spec and a quantity at or above the minimum order, and there is an Incoterm or a destination. Delivery is not required. Kimi K2.7 Code broke this 17 times: each time it gave "medium" because the Incoterm, destination or delivery date was missing (for example "Real inquiry with spec and quantity but no incoterm provided"). GPT-6 Luna did it 7 times, sometimes for the same reason and sometimes calling a complete spec incomplete. These make up 17 of Kimi's 19 and 7 of Luna's 11 critical errors. Kimi's other non-R55 error treated a sample request (2 blankets, then about 200 a quarter) as not a real inquiry. Neither model got a target price wrong.
+
+Priority follows a fixed rule, so one fix worth testing is to work it out in code from the extracted fields instead of asking the model.
+
+## 9. Choices made along the way
 
 - **Two tasks, not more.** Extraction and priority are easy to score objectively. Reply drafting was left out because it is hard to grade fairly.
 - **Single prompt, no tuning per model.** Fair and cheap. A team could tune the winner later.
@@ -121,9 +135,9 @@ R55 is a Russian inquiry for "термальные пластины CTP" (therma
 - **Human error is part of the comparison.** Without it, any AI error looks like pure loss.
 - **Maintenance is inside the break-even; setup is not.** Setup is one-time, so it sets the payback period instead.
 
-## 9. What would make this a real decision
+## 10. What would make this a real decision
 
 1. Label 50 to 100 real, anonymized inquiries and re-run. The synthetic set is too easy for the Claude models to tell them apart.
-2. Run the cheapest candidates through the API (for a Chinese team, include DeepSeek and Qwen, which are reachable in mainland China).
+2. Run the cheapest candidates through the API. For a Chinese team, confirm DeepSeek's result through its own API and add Qwen; both are reachable in mainland China.
 3. Time 10 inquiries by hand and 10 AI reviews to replace the minutes assumptions.
 4. Pick the cheapest model under the bar, then track the catch rate in the first month.

@@ -17,6 +17,24 @@ GRID = "#e1e0d9"
 AXIS = "#c3c2b7"
 
 SOURCE = "Prices checked 2026-10-23 (see data/pricing.csv). Labor and error-cost inputs: data/roi_inputs.csv."
+TESTED = "All models answered in batches of 20 inside agents (no API), two runs each."
+
+# Hand-placed labels for points that sit close together: (dx, dy) in points, horizontal and vertical alignment.
+# Any method not listed gets its label just above the point.
+LABEL_OFFSETS = {
+    "anthropic__claude-haiku-5-5": (0, -12, "center", "top"),
+    "workbuddy__deepseek-v4-pro": (0, -12, "center", "top"),
+    "anthropic__claude-opus-5-5": (0, -12, "center", "top"),
+    "anthropic__claude-sonnet-5-5": (50, 16, "center", "bottom"),
+    "codex__gpt-6.1-sol": (-48, 18, "center", "bottom"),
+    "workbuddy__kimi-2-7": (10, 0, "left", "center"),
+}
+
+
+def round4(value):
+    """Round half up to 4 decimals (19/160 = 0.11875 -> 0.1188), so tables and charts show the same number."""
+    from decimal import Decimal, ROUND_HALF_UP
+    return float(Decimal(repr(value)).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP))
 
 
 def use_style():
@@ -108,7 +126,7 @@ def plot_breakeven(curves, rules_point, llm_points, breakeven, volume, path):
         hi = max(e for e, _ in llm_points)
         bottom = min(net for _, net in llm_points)
         top = max(net for _, net in llm_points)
-        ax.text(0.035, 0.54, f"Tested models (measured errors)\n{lo:.2%} to {hi:.2%} errors\n"
+        ax.text(0.035, 0.54, f"Tested models (measured errors)\n{round4(lo):.2%} to {round4(hi):.2%} errors\n"
                 f"API-price scenario: {signed(bottom)} to {signed(top)}/month",
                 transform=ax.transAxes, fontsize=9, color=INK, va="top", ha="left")
     ax.set_xlabel("Critical error rate: share of inquiries with a wrong product, spec, quantity, price or date")
@@ -120,8 +138,7 @@ def plot_breakeven(curves, rules_point, llm_points, breakeven, volume, path):
     ax.legend(frameon=False, loc="upper right", fontsize=9)
     titles(fig, "Estimated net benefit falls as critical errors increase",
            "Cheapest vs priciest model with the same workflow (AI draft + human review): the lines almost overlap.")
-    source(fig, "Claude and GPT: non-API batches of 20, two runs each. API costs are scenario estimates, not actual Codex costs.\n"
-                + SOURCE)
+    source(fig, TESTED + " API costs are list-price estimates.\n" + SOURCE)
     fig.savefig(path)
     plt.close(fig)
 
@@ -202,34 +219,20 @@ def plot_sensitivity(rows, base, path):
 def plot_measured(methods, breakeven, path):
     fig, ax = plt.subplots(figsize=(9, 5.2))
     fig.subplots_adjust(left=0.11, right=0.95, top=0.78, bottom=0.16)
-    methods = sorted(methods, key=lambda m: max(m["cost_per_1000"], 0.05))
-    xs = [max(m["cost_per_1000"], 0.05) for m in methods]
-    label_positions = []
-    for i, m in enumerate(methods):
-        x, y = xs[i], m["critical_error_rate"] * 100
+    for m in methods:
+        x, y = max(m["cost_per_1000"], 0.05), m["critical_error_rate"] * 100
         ax.plot([x], [y], "o", ms=9, color=INK if m["method"] == "rules" else BLUE, mec=SURFACE, mew=2, zorder=5)
-        # Stagger labels for nearby points on the log axis, including equal-cost models.
-        label_y = y + 1.3
-        nearby = [py for px, py in label_positions if max(px, x) / min(px, x) < 3]
-        while any(abs(label_y - py) < 3.5 for py in nearby):
-            label_y = max(py + 3.5 for py in nearby if abs(label_y - py) < 3.5)
-        label_positions.append((x, label_y))
-        label_x = x
-        if i + 1 < len(xs) and xs[i + 1] == x and abs(methods[i + 1]["critical_error_rate"] * 100 - y) < 3.5:
-            label_x = x * 1.6
-        elif i > 0 and xs[i - 1] == x and abs(methods[i - 1]["critical_error_rate"] * 100 - y) < 3.5:
-            label_x = x / 2
-        # Use the same four-decimal rate as method_summary.csv for displayed percentages.
-        displayed_rate = round(m["critical_error_rate"], 4)
-        ax.annotate(f"{m['name']}\n{displayed_rate:.2%}", (x, y), xytext=(label_x, label_y), textcoords="data",
-                    fontsize=9, color=INK_2, ha="center", va="bottom",
-                    arrowprops={"arrowstyle": "-", "color": MUTED, "lw": 0.6}
-                    if label_y > y + 1.3 or label_x != x else None)
+        dx, dy, ha, va = LABEL_OFFSETS.get(m["method"], (0, 9, "center", "bottom"))
+        far = abs(dx) > 20 or abs(dy) > 20                       # draw a thin leader line for moved labels
+        ax.annotate(f"{m['name']}\n{round4(m['critical_error_rate']):.2%}", (x, y), xytext=(dx, dy),
+                    textcoords="offset points", fontsize=9, color=INK_2, ha=ha, va=va,
+                    arrowprops={"arrowstyle": "-", "color": MUTED, "lw": 0.6, "shrinkB": 5} if far else None)
     ax.axhline(breakeven * 100, color=INK, lw=1)
     ax.text(0.055, breakeven * 100 - 1.2, f"Break-even: {breakeven:.0%}", fontsize=9, color=INK, va="top")
     ax.set_xscale("log")
     ax.set_xlim(0.02, 30)
-    ax.set_ylim(-2, 30)
+    ax.set_ylim(-7, 30)
+    ax.set_yticks(range(0, 31, 5))
     ax.set_xticks([0.05, 0.1, 1, 10], ["no API", "$0.10", "$1", "$10"])
     ax.set_xlabel("Estimated API cost per 1,000 inquiries at list price (log scale)")
     ax.set_ylabel("Critical error rate (80 test inquiries)")
@@ -237,8 +240,8 @@ def plot_measured(methods, breakeven, path):
     ax.grid(color=GRID, lw=0.6)
     ax.set_axisbelow(True)
     titles(fig, "Tested models have lower critical error rates than the rules baseline",
-           "Claude and GPT: non-API batches of 20, two runs each, averaged. Rules use no AI.")
-    source(fig, "API costs are scenario estimates, not actual Codex costs. Test data was written with Claude's help,\n"
+           TESTED.replace(", two runs each.", ", two runs each, averaged. Rules use no AI."))
+    source(fig, "API costs are list-price estimates, not what Codex or WorkBuddy charged. Test data was written with Claude's help,\n"
                 "which may favor Claude. Results cover 80 synthetic inquiries.")
     fig.savefig(path)
     plt.close(fig)

@@ -143,5 +143,6 @@
       "reply_sha256": "26b046db1e4ae3d06c22ad2deea30cf94c1530e9bbb87d486ca43bd8ebedd00f",
       "nonfatal_warnings": []
     }
-  ]
+  ],
+  "batch_delivery": "The orchestrating WorkBuddy session read each batch file and pasted its full text into a fresh subagent task; the subagent had no file access. file_reads names the batch file the text came from."
 }

@@ -61,7 +61,8 @@
       "other_tools_used": false,
       "prompt_sha256": "896bd27f1acfd86898613de1fcc3a35303977ffcbeb6c382b72b780519f365f3",
       "reply_sha256": "e23562291d4830b5dc6765bddc65c195dccfbc8121e06e42f8b1abc2bfb59476",
-      "nonfatal_warnings": []
+      "nonfatal_warnings": [],
+      "retry_reason": "First reply had a duplicated JSON key (as reported by the WorkBuddy session); rerun once in a new subagent. The first reply was not kept."
     },
     {
       "run": "run1",
@@ -143,5 +144,6 @@
       "reply_sha256": "8c8b57ed8ba02624d0a6c3aef5a293894417ba091ea0b239ce0526838a4477a8",
       "nonfatal_warnings": []
     }
-  ]
+  ],
+  "batch_delivery": "The orchestrating WorkBuddy session read each batch file and pasted its full text into a fresh subagent task; the subagent had no file access. file_reads names the batch file the text came from."
 }

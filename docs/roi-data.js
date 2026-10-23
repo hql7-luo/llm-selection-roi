@@ -265,13 +265,49 @@ window.ROI_DATA = {
    "field_accuracy": 0.9784226190476191,
    "public_index": 30.0,
    "tested_via": "Codex, batch of 20"
+  },
+  {
+   "method": "workbuddy__deepseek-v4-pro",
+   "name": "DeepSeek V4 Pro",
+   "provider": "deepseek",
+   "status": "measured",
+   "cost_per_1000": 1.637782575,
+   "cost_basis": "estimated",
+   "critical_error_rate": 0.0,
+   "field_accuracy": 1.0,
+   "public_index": 36.0,
+   "tested_via": "WorkBuddy subagent, batch of 20"
+  },
+  {
+   "method": "workbuddy__deepseek-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "provider": "deepseek",
+   "status": "measured",
+   "cost_per_1000": 0.4179264375,
+   "cost_basis": "estimated",
+   "critical_error_rate": 0.0125,
+   "field_accuracy": 0.9947916666666667,
+   "public_index": 45.0,
+   "tested_via": "WorkBuddy subagent, batch of 20"
+  },
+  {
+   "method": "workbuddy__kimi-2-7",
+   "name": "Kimi K2.7 Code",
+   "provider": "moonshot",
+   "status": "measured",
+   "cost_per_1000": 1.35390246875,
+   "cost_basis": "estimated",
+   "critical_error_rate": 0.11875,
+   "field_accuracy": 0.9776785714285714,
+   "public_index": 26.0,
+   "tested_via": "WorkBuddy subagent, batch of 20"
   }
  ],
  "headline": {
   "hourly_cost_usd": 9.701981790883808,
   "manual_cost_per_1000_usd": 970.1981790883809,
   "labor_saved_per_1000_usd": 727.6486343162856,
-  "breakeven_error_rate_median_model": 0.17013431439523177,
+  "breakeven_error_rate_median_model": 0.1700785223598361,
   "breakeven_error_rate_cheapest": 0.17019454299419226,
   "breakeven_error_rate_priciest": 0.16946274120501423,
   "cheapest_model": "Qwen3.7 Flash",
@@ -284,7 +320,7 @@ window.ROI_DATA = {
   "rules_net_per_month_usd": -124.98361000539228,
   "value_of_one_point_per_month_usd": 41.94039635817675,
   "price_gap_priciest_vs_cheapest_per_month_usd": 3.069205709375,
-  "cost_to_test_all_models_3_runs_usd": 3.3150945945,
+  "cost_to_test_all_models_3_runs_usd": 4.033099005,
   "estimated_input_tokens": 783.713125,
   "estimated_output_tokens": 152.34375,
   "test_inquiries": 80

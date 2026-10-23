@@ -35,7 +35,7 @@ def write_csv(path, rows, columns=None):
 
 
 def _round(value):
-    return round(value, 4) if isinstance(value, float) else value
+    return charts.round4(value) if isinstance(value, float) else value
 
 
 def cost_scenarios(summary, prices):

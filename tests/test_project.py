@@ -117,6 +117,8 @@ def test_rules_catch_spam():
 # ---------- subagent runs ----------
 
 CLAUDE_RUNS = ["anthropic__claude-haiku-5-5", "anthropic__claude-sonnet-5-5", "anthropic__claude-opus-5-5"]
+AGENT_RUNS = CLAUDE_RUNS + ["codex__gpt-6.1-sol", "codex__gpt-6-luna", "workbuddy__deepseek-v4-pro",
+                            "workbuddy__deepseek-flash", "workbuddy__kimi-2-7"]
 
 
 def test_batch_prompt_has_no_answers():
@@ -132,14 +134,16 @@ def test_parse_reply_reads_jsonl_lines():
     assert list(answers) == ["R01"] and json.loads(answers["R01"])["priority"] == "low"
 
 
-@pytest.mark.parametrize("method", CLAUDE_RUNS)
+# Every agent run file (Claude subagents, Codex, WorkBuddy) must be exactly what its saved raw replies give
+@pytest.mark.parametrize("method", AGENT_RUNS)
 def test_subagent_run_files_match_raw_replies(method, tmp_path):
     inquiries, _ = load_dataset("test")
     ids = [q["id"] for q in inquiries]
     folder = ROOT / "runs" / method
     copy = tmp_path / method
     shutil.copytree(folder / "raw", copy / "raw")
-    batch.import_raw(copy, ids)
+    via = read_jsonl(folder / "run1.jsonl")[0]["via"]
+    batch.import_raw(copy, ids, via)
     for run in ("run1.jsonl", "run2.jsonl"):
         assert (copy / run).read_text(encoding="utf-8") == (folder / run).read_text(encoding="utf-8")
         records = read_jsonl(folder / run)

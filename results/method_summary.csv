@@ -10,3 +10,6 @@ qwen__qwen3.7-flash,Qwen3.7 Flash,qwen,pending,,0.0433,estimated,,0.1702,,,,,,,,
 qwen__qwen3.5-plus,Qwen3.5 Plus,qwen,pending,,0.6791,estimated,,0.1701,,,,,,,,,,,,,,,,,
 codex__gpt-6.1-sol,GPT-6.1 Sol,openai,measured,"Codex, batch of 20",3.0909,estimated,48.0,0.1698,0.0125,0.9955,0.0073,0.0,0.0,0.9875,0.0,1,1,2,,,659.8534,3.031,0.0208,0.0,0.0
 codex__gpt-6-luna,GPT-6 Luna,openai,measured,"Codex, batch of 20",0.1545,estimated,30.0,0.1702,0.0688,0.9784,0.0073,0.0,0.0,0.9375,0.0761,0.7875,0.825,2,,,425.4068,4.7014,0.0729,0.1,0.0
+workbuddy__deepseek-v4-pro,DeepSeek V4 Pro,deepseek,measured,"WorkBuddy subagent, batch of 20",1.6378,estimated,36.0,0.17,0.0,1.0,0.0,0.0,0.0,1.0,0.0,0.9,1,2,,,713.0054,2.805,0.0,0.0,0.0
+workbuddy__deepseek-flash,DeepSeek V4.1 Flash,deepseek,measured,"WorkBuddy subagent, batch of 20",0.4179,estimated,45.0,0.1701,0.0125,0.9948,0.0073,0.0,0.0,0.9938,0.0,0.9375,0.9875,2,,,661.1899,3.0248,0.0208,0.0,0.0
+workbuddy__kimi-2-7,Kimi K2.7 Code,moonshot,measured,"WorkBuddy subagent, batch of 20",1.3539,estimated,26.0,0.17,0.1188,0.9777,0.0073,0.0,0.0,0.8813,0.1848,0.6625,0.875,2,,,215.1052,9.2978,0.1146,0.2,0.0
