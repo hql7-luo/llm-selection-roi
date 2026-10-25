@@ -264,3 +264,12 @@ def test_calculator_data_is_up_to_date():
     for m in data["methods"]:
         assert m["status"] == summary[m["method"]]["status"]
         assert m["cost_per_1000"] == pytest.approx(float(summary[m["method"]]["cost_per_1000_usd"]), abs=1e-3)
+
+
+def test_duplicate_inquiry_ids_are_rejected_in_run_files(tmp_path):
+    from llmroi.evaluate import load_runs
+
+    record = {"id": "R01", "output": {"items": []}}
+    (tmp_path / "run1.jsonl").write_text(json.dumps(record) + "\n" + json.dumps(record) + "\n")
+    with pytest.raises(ValueError, match="Duplicate inquiry ID"):
+        load_runs(tmp_path)

@@ -21,7 +21,14 @@ def load_runs(method_dir):
     runs = []
     for path in sorted(method_dir.glob("run*.jsonl")):
         with open(path, encoding="utf-8") as f:
-            runs.append({r["id"]: r for r in map(json.loads, f) if r.get("id") and not r.get("error")})
+            records = {}
+            for record in map(json.loads, f):
+                if not record.get("id") or record.get("error"):
+                    continue
+                if record["id"] in records:
+                    raise ValueError(f"Duplicate inquiry ID {record['id']} in {path}")
+                records[record["id"]] = record
+            runs.append(records)
     return runs
 
 
