@@ -174,4 +174,4 @@ tests/         checks for data, scoring, rules, runner and ROI
 
 ## About
 
-Independent project by Haoqi Luo (University of Washington, Foster School of Business). I chose the business question from my export sales experience and set the scope. Claude helped a lot with the research, data, code and writing, Codex ran the GPT tests and helped update the docs, and WorkBuddy ran the DeepSeek and Kimi tests. Not financial advice.
+Independent project by Haoqi Luo. I chose the question, checked the data and results, and decided the conclusions. AI coding tools helped with the implementation. Not financial advice.
